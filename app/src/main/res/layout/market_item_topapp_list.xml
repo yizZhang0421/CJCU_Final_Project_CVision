@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="10dp"
+    android:orientation="vertical"
+    android:id="@+id/wraper">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.cjcu.ima105.cvision.market.customfonts.MyTextView_Roboto_Medium
+            android:id="@+id/number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:textSize="15dp"
+            android:layout_gravity="center"/>
+        <com.github.siyamed.shapeimageview.mask.PorterShapeImageView
+            android:id="@+id/image"
+            android:layout_width="58dp"
+            android:layout_height="58dp"
+            app:siShape="@drawable/market_shape_rect"
+            android:src="@drawable/market_ic_instagram"
+            android:layout_marginLeft="20dp"
+            app:siSquare="true"/>
+
+
+    <!--<ImageView-->
+        <!--android:id="@+id/image"-->
+        <!--android:layout_width="60dp"-->
+        <!--android:layout_height="60dp"-->
+        <!--android:layout_marginLeft="20dp"-->
+        <!--android:src="@drawable/ic_instagram"/>-->
+
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_marginTop="5dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <RatingBar
+                        android:id="@+id/ratingbar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:numStars="5"
+                        android:stepSize="1.0"
+                        android:rating="4"
+                        android:isIndicator="false"
+                        style="?android:attr/ratingBarStyleSmall"
+                        android:theme="@style/RatingBar"
+                        android:scaleX="0.8"
+                        android:scaleY="0.8"
+                        />
+
+                    <com.cjcu.ima105.cvision.market.customfonts.MyTextView_Roboto_Regular
+                        android:id="@+id/view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="23.3M"
+                        android:textSize="9dp"
+                        android:layout_marginLeft="8dp"
+                        android:textColor="@color/sub_text_color"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_gravity="center"
+                    android:orientation="vertical">
+
+                    <com.cjcu.ima105.cvision.market.customfonts.MyTextView_Roboto_Regular
+                        android:id="@+id/title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_color"
+                        android:textSize="13dp"
+                        android:text="Instagram"/>
+
+
+                    <com.cjcu.ima105.cvision.market.customfonts.MyTextView_Roboto_Regular
+                        android:id="@+id/intall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/sub_text_color"
+                        android:layout_marginTop="17dp"
+                        android:textSize="10dp"
+                        android:text="Installed 8.7m time(s)"/>
+
+                </LinearLayout>
+            </FrameLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/description"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/view_line"/>
+
+</LinearLayout>

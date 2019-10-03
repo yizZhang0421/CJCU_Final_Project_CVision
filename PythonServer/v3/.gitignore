@@ -1,0 +1,15 @@
+#ignore all
+*
+
+#folder
+!labels/
+!labels/**
+!models/
+!models/**
+!hyper_space/
+!hyper_space/**
+
+# And all the file types you're interested in.
+!.gitignore
+!*.py
+!*.sql

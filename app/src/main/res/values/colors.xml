@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="colorBlack">#000000</color>
+
+
+    <!-- com.cjcu.ima105.cvision.market -->
+    <color name="transperent">#00000000</color>
+    <color name="view_line">#d4d9d5</color>
+    <color name="bg_color">#f5f5f5</color>
+    <color name="tabIndicator_color">#5e9188</color>
+    <color name="Indicator_tabSelectedTextColor">#5e9188</color>
+    <color name="Indicator_tabTextColor">#2e332d</color>
+    <color name="yellow">#ec8f04</color>
+    <color name="gray">#bdbdbd</color>
+    <color name="sub_text_color">#95989a</color>
+    <color name="text_color">#282d27</color>
+    <color name="btn_txt_color">#36ae9e</color>
+</resources>

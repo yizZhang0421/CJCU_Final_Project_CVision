@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#e0e0e0"
+    android:padding="20dp"
+    android:orientation="vertical">
+    <TextView
+        android:id="@+id/train_hint"
+        android:text=""
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/start_train_button"
+        android:text="開始訓練"
+        android:background="#FFFFFF"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:text="開始訓練就不可以執行增加圖片、類別等操作
+該模型會消失在模型列表中
+可以在首頁的進度列表中看到訓練的進度
+可以中斷或等到完成訓練即可復原"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

@@ -1,0 +1,11 @@
+#ignore all
+*
+
+#folder
+!models/
+!models/**
+
+# And all the file types you're interested in.
+!.gitignore
+!*.py
+

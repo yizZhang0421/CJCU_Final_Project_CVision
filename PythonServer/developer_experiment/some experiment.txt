@@ -1,0 +1,29 @@
+google sign in just request for KEY
+
+any platform, language...etc, just need pass the KEY, you can access your files and your functions.
+
+so any developer just need design a file to input KEY of your users.
+
+if you add a google sign in api mechanism, it just to convinence for user, cause you can use sign to get KEY response
+
+that user don't need type their KEY manully.
+
+
+so...First thing I need research is "how to valify sign in from"
+[I SOLVE IT!! just send idtoken and your sign in client id to my server to exchange you key!!]
+
+NEXT: test how to use google sign in from java or python
+[SOLVE IT!! there is official documents below, and ypu can check a simple python example at CVision website.]
+
+===sign in registe tutorial(optional, you can just use your KEY to access service, GSI is for convience switch user or something)===
+## https://developers.google.com/identity ##
+## https://developers.google.com/api-client-library ##
+google api console
+add auth2.0
+select where are you call from
+copy your client id
+search sign in sdk for your application
+paste your client id at where sdk need
+-FINISH-
+post idtoken and client id to cvision server to exchange KEY(you should registe before request KEY, you can registe at CVision website)
+use KEY access any CVision service you have.

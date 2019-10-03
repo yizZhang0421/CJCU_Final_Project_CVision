@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/textview_no_predict_model_banner"
+        android:visibility="gone"
+        android:text="沒有模型可以使用"
+        android:textSize="30dp"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <RelativeLayout
+        android:id="@+id/relativelayout_camera_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.camerakit.CameraKitView
+            android:id="@+id/camera"
+            android:layout_centerInParent="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:camera_imageMegaPixels="3"
+            android:adjustViewBounds="false"
+            app:camera_imageJpegQuality="100"
+            android:keepScreenOn="true"
+            app:camera_flash="auto"
+            app:camera_facing="back"
+            app:camera_focus="continuous"
+            app:camera_permissions="camera" />
+        <com.cjcu.ima105.cvision.CropWindowView
+            android:id="@+id/crop_window"
+            android:visibility="gone"
+            android:layout_centerInParent="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+        <FrameLayout
+            android:id="@+id/pnlFlash"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#FFFFFF"
+            android:visibility="gone"/>
+    </RelativeLayout>
+    <LinearLayout
+        android:id="@+id/linearlayout_camera_button_wrapper"
+        android:layout_below="@+id/relativelayout_camera_wrapper"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:background="#000000"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">`
+        <ImageView
+            android:id="@+id/crop_mode_button"
+            android:src="@mipmap/crop_mode"
+            android:layout_weight="1"
+            android:minHeight="128px"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+        <ImageView
+            android:id="@+id/capture_button"
+            android:src="@mipmap/capture"
+            android:layout_weight="1"
+            android:minHeight="128px"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+        <ImageView
+            android:id="@+id/imageview_choose_predict_model_button"
+            android:src="@mipmap/menu"
+            android:layout_weight="1"
+            android:minHeight="128px"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+</RelativeLayout>

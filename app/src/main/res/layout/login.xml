@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Login">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center">
+        <pl.droidsonroids.gif.GifImageView
+            android:visibility="visible"
+            android:id="@+id/login_ani"
+            android:background="@mipmap/login_ani"
+            android:layout_width="520px"
+            android:layout_height="520px"/>
+        <pl.droidsonroids.gif.GifImageView
+            android:visibility="gone"
+            android:id="@+id/server_fail"
+            android:background="@mipmap/server_fail"
+            android:layout_width="800px"
+            android:layout_height="600px" />
+
+        <TextView
+            android:id="@+id/textview_appname"
+            android:layout_alignBottom="@id/login_ani"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/archivo_black"
+            android:text="CVision"
+            android:textColor="#717070"
+            android:textSize="30dp" />
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -1,0 +1,17 @@
+#ignore all
+*
+
+#folder
+!v2/
+!v2/**
+!v3/
+!v3/**
+!developer_experiment/
+!developer_experiment/**
+
+# And all the file types you're interested in.
+!.gitignore
+!*.txt
+!*.sql
+!*.json
+!*.py

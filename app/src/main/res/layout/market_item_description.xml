@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MarketItemDescription"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </android.support.v7.widget.Toolbar>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="20dp"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.github.siyamed.shapeimageview.mask.PorterShapeImageView
+                android:id="@+id/image"
+                android:layout_width="58dp"
+                android:layout_height="58dp"
+                app:siShape="@drawable/market_shape_rect"
+                android:src="@drawable/market_ic_instagram"
+                android:layout_marginLeft="20dp"
+                app:siSquare="true"/>
+
+            <LinearLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_marginTop="5dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_gravity="center_vertical"
+                        android:orientation="horizontal">
+
+
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="15dp"
+                        android:layout_gravity="center"
+                        android:orientation="vertical">
+
+                        <com.cjcu.ima105.cvision.market.customfonts.MyTextView_Roboto_Regular
+                            android:id="@+id/title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_color"
+                            android:textSize="16dp"
+                            android:text="Instagram"/>
+
+
+                        <com.cjcu.ima105.cvision.market.customfonts.MyTextView_Roboto_Regular
+                            android:id="@+id/intall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/sub_text_color"
+                            android:textSize="10dp"
+                            android:text="Installed 8.7m time(s)"/>
+
+                    </LinearLayout>
+                </FrameLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="30dp">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:text="評分"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <RatingBar
+                    android:id="@+id/ratingbar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:numStars="5"
+                    android:stepSize="1.0"
+                    android:rating="4"
+                    android:isIndicator="false"
+                    style="?android:attr/ratingBarStyleSmall"
+                    android:theme="@style/RatingBar"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"
+                    />
+            </LinearLayout>
+            <View
+                android:layout_width="0.5dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:background="@color/view_line"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:text="匯入次數"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <com.cjcu.ima105.cvision.market.customfonts.MyTextView_Roboto_Regular
+                    android:id="@+id/view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="23.3M"
+                    android:textSize="9dp"
+                    android:textColor="@color/sub_text_color"
+                    android:layout_weight="0.5"
+                    android:layout_gravity="center"
+                    android:gravity="center"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <com.cjcu.ima105.cvision.market.customfonts.Button_Roboto_Medium
+            android:background="@color/colorPrimary"
+            android:text="匯入"
+            android:textColor="@color/bg_color"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"/>
+        <com.cjcu.ima105.cvision.market.customfonts.MyTextView_Roboto_Black
+            android:text="介紹："
+            android:layout_marginTop="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <com.cjcu.ima105.cvision.market.customfonts.MyTextView_Roboto_Bold
+            android:id="@+id/description"
+            android:text="sdrgvjdlfgdijgbmirsvujgivusrmilgjvo\nwaernvchueoihrvc\nejrovesurovuesdrohjvoersjvos\n\n\n\n\n\n\n\n\n\n\earfverfv\n\n\nwearvcervesrtverstvesrtvcstc\n\n\n\n\n\n\n\n\n\n\n\n\esrgvesrgvesrgvesrrvcervesrtverstvesrtvcstc\n\n\n\n\n\n\n\n\n\n\n\n\esrgvesrgvesrgvesr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"
+            android:singleLine="false"
+            android:maxLines="25"/>
+    </LinearLayout>
+</LinearLayout>

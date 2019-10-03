@@ -1,0 +1,11 @@
+#ignore all
+*
+
+#folder
+!src/
+!src/**
+
+# And all the file types you're interested in.
+!.gitignore
+!build.gradle
+

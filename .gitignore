@@ -1,0 +1,17 @@
+#ignore all
+*
+
+#folder
+!app/
+!app/**
+!PythonServer/
+!PythonServer/**
+!UML/
+!UML/**
+!web/
+!web/**
+
+# And all the file types you're interested in.
+!.gitignore
+!build.gradle
+!README.md
