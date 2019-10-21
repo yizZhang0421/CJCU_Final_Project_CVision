@@ -9,6 +9,7 @@ from tensorflow import Graph, Session
 from threading import local
 K.clear_session()
 
+
 '''
 graph_bear=Graph()
 session_bear=Session(graph=graph_bear)
@@ -17,7 +18,7 @@ with graph_bear.as_default():
         model_bear=load_model('models/'+'1557822345285-7CC7D436-469D-4DF6-8B8A-BC2C886287D0'+'.h5')
 '''
 
-def predict_start(model_id, image):
+def predict_start(progress_dict, model_id, image):
     #global model_bear, graph_bear, session_bear
     class_label=json.loads(db_operate.get_class_label(model_id))
     image=cv2.resize(image,(100,100),interpolation=cv2.INTER_CUBIC)
@@ -53,16 +54,8 @@ def predict_start(model_id, image):
                 d.result=model_bear.predict_classes(image)[0]
     '''
     
-    try:
-        del d.graph
-    except:
-        pass
-    try:
-        del d.session
-    except:
-        pass
-    try:
-        del d.model
-    except:
-        pass
-    return class_label[str(d.result)]
+    del d.model
+    del d.graph
+    del d.session
+    
+    progress_dict[model_id]=class_label[str(d.result)]

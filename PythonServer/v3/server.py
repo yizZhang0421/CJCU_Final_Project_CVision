@@ -6,9 +6,12 @@ CORS(app, resources=r'/*')
 import cv2, base64, json, io, urllib, os, re, copy, requests
 import numpy as np
 
+
 from train_server import train_start, progress_stream
 from prediction_server import predict_start
 import db_operate, code_table
+
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 from google.oauth2 import id_token
@@ -245,6 +248,7 @@ import time
 training_thread_dict={}
 if __name__ == '__main__':
     progress_dict=Manager().dict()
+    predict_dict=Manager().dict()
     hyper_thread_dict=Manager().dict()
 def clean_train_dict():
     while 1:
@@ -322,14 +326,15 @@ def terminate_train():
         pass
     db_operate.train_model_stop(model_id)
     return json.dumps(code_table.ok, ensure_ascii=False)
-    
+
+
 @app.route('/predict',methods=['POST'])                                    #! would fail if model untrained
 def predict():
     key=urllib.parse.unquote(request.form['key'])
     if is_key_exist(key)==False:
         return json.dumps(code_table.error_key_is_not_exist, ensure_ascii=False)
     model_id=urllib.parse.unquote(request.form['model_id'])
-    if key!=db_operate.get_model_key(model_id):
+    if key!=db_operate.get_model_key(model_id) and db_operate.is_valid_permission(key, model_id, code_table.model_permission_predict)==False:
         return json.dumps(code_table.error_invalid_key, ensure_ascii=False)
     if db_operate.get_model_status(model_id) is not code_table.model_status_predictable:
         return json.dumps(code_table.error_untrained_model, ensure_ascii=False)
@@ -341,9 +346,12 @@ def predict():
     image = cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_COLOR)
     if isinstance(image, np.ndarray) is not True and image is None:
         return json.dumps(code_table.error_not_image_data, ensure_ascii=False)
-    p=pool.ThreadPool()
-    result=p.apply_async(predict_start, (model_id, image))
-    result=result.get()
+    if __name__ == '__main__':
+        P=Process(target=predict_start, args=(progress_dict, model_id, image))
+        P.start()
+        P.join()
+    result=progress_dict[model_id]
+    del progress_dict[model_id]
     return_data=copy.deepcopy(code_table.ok)
     return_data['data']=result
     return json.dumps(return_data, ensure_ascii=False)
@@ -361,15 +369,48 @@ def get_tflite():
     
     bytedata=open('models/'+model_id+'.h5', 'rb').read()
     response=requests.post('http://104.199.210.117:1024', data=bytedata)
-    #def gen():
-    #    return response.content
-    #return Response(stream_with_context(gen()))
     return send_file(io.BytesIO(response.content), mimetype='application/octet-stream')
 
 
-#@app.route('/get_all_models',methods=['POST'])
-#def get_all_models():
-#    pass
+#========= TRADE SYSTEM ==========#
+def is_model_buyable(model_id):
+    result=db_operate.is_model_buyable(model_id)
+    if len(result)==0:
+        return False
+    else:
+        return True
+@app.route('/share_model',methods=['POST'])
+def share_model():
+    key=urllib.parse.unquote(request.form['key'])
+    if is_key_exist(key)==False:
+        return json.dumps(code_table.error_key_is_not_exist, ensure_ascii=False)
+    model_id=urllib.parse.unquote(request.form['model_id'])
+    if len(db_operate.is_model_exist(model_id))==0:
+        return json.dumps(code_table.error_object_not_exist, ensure_ascii=False)
+    if key!=db_operate.get_model_key(model_id):
+        return json.dumps(code_table.error_invalid_key, ensure_ascii=False)
+    share=urllib.parse.unquote(request.form['share'])
+    result=db_operate.share_model(model_id, share)
+    return db_result_parse_to_response_string(result)
+@app.route('/model_store',methods=['GET', 'POST'])
+def model_store():
+    result=db_operate.model_store()
+    return db_result_parse_to_response_string(result)
+@app.route('/dataset_store',methods=['GET', 'POST'])
+def dataset_store():
+    pass
+@app.route('/model_import',methods=['POST'])
+def model_import():
+    key=urllib.parse.unquote(request.form['key'])
+    if is_key_exist(key)==False:
+        return json.dumps(code_table.error_key_is_not_exist, ensure_ascii=False)
+    model_id=urllib.parse.unquote(request.form['model_id'])
+    if len(db_operate.is_model_exist(model_id))==0:
+        return json.dumps(code_table.error_object_not_exist, ensure_ascii=False)
+    if is_model_buyable(model_id)==False:
+        return json.dumps(code_table.error_model_unbuyable, ensure_ascii=False)
+    result=db_operate.model_import(model_id, key)
+    return db_result_parse_to_response_string(result)
 
 @app.errorhandler(404)
 def page_not_found(e):

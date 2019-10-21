@@ -11,6 +11,7 @@ from tensorflow import Graph, Session
 from sklearn.model_selection import train_test_split
 
 import create_hyper_py
+
 def train_start(progress_dict, hyper_thread_dict, model_id, labels):
     d=local()
     d.graph=Graph()
@@ -97,24 +98,29 @@ def train_start(progress_dict, hyper_thread_dict, model_id, labels):
                         yield (np.array(x), np.array(y))
                 
                 d.acc=-999
-                d.loss=999
                 d.epoch=0
-                d.patient=1
+                d.patient=3
                 #==========================================================#
                 while 1:
                     d.history_train=d.model.fit_generator(gen_train(X_train, y_train), steps_per_epoch=math.ceil(len(X_train)/32), epochs=1, verbose=1)
                     d.history_test=d.model.evaluate_generator(gen_val(X_test, y_test), steps=math.ceil(len(X_test)/32))
                     d.epoch+=1
                     progress_dict[model_id]={'epoch':d.epoch,'acc':d.history_test[1],'loss':d.history_test[0]}
-                    if d.history_test[0]>d.history_train.history['loss']:
+                    if d.history_test[1]>d.acc:
+                        d.acc=d.history_test[1]
+                        continue
+                    else:
+                        is_update=False
                         for i in range(d.patient):# train patient times 
                             d.history_train=d.model.fit_generator(gen_train(X_train, y_train), steps_per_epoch=math.ceil(len(X_train)/32), epochs=1, verbose=1)
                             d.history_test=d.model.evaluate_generator(gen_val(X_test, y_test), steps=math.ceil(len(X_test)/32))
                             d.epoch+=1
                             progress_dict[model_id]={'epoch':d.epoch,'acc':d.history_test[1],'loss':d.history_test[0]}
-                        if d.history_test[0]>d.history_train.history['loss']:
-                            d.acc=d.history_test[1]
-                            d.loss=d.history_test[0]
+                            if d.history_test[1]>d.acc:
+                                is_update=True
+                                d.acc=d.history_test[1]
+                                break
+                        if is_update==False:
                             break
                 #==========================================================#
                 d.model.save('models/'+model_id+'.h5')
@@ -123,7 +129,7 @@ def train_start(progress_dict, hyper_thread_dict, model_id, labels):
         size=os.path.getsize('models/'+model_id+'.h5')
         size=(size/1024)/1024
         class_label=json.dumps({labels.index(label):label['name'] for label in labels}, ensure_ascii=False).replace('"', '\\"')
-        db_operate.fill_model_details(model_id, size, d.acc, d.loss, class_label)
+        db_operate.fill_model_details(model_id, size, d.history_test[1], d.history_test[0], class_label)
         db_operate.train_model_finish(model_id)
         del d.model
     except:

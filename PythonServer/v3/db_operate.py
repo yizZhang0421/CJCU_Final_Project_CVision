@@ -3,6 +3,7 @@ import os, shutil
 
 import code_table
 
+
 def register(mail, name):
     command='select user.key from user where email='+list_to_value_string([mail])
     result=do(command)
@@ -48,6 +49,14 @@ def get_model_key(model_id):
     if len(result)==0:
         return ''
     return result[0]['key']
+
+def is_valid_permission(key, model_id, permission_code):
+    command='select `key` from `model_users` where `key`='+list_to_value_string([key])+' and `model_id`='+list_to_value_string([model_id])+' and `permission`='+list_to_value_string([permission_code])
+    result=do(command)
+    if len(result)==0:
+        return False
+    else:
+        return True
         
 def delete_model(model_id):
     labelid_name=label_list(model_id)
@@ -123,8 +132,8 @@ def progress_list(key):
 def predictable_model_list(key):
     command='SELECT `model`.`id`, `model`.`name`, `user`.`email` FROM `model`, `user` WHERE `model`.`key` = `user`.`key` AND `model`.`key` = '+list_to_value_string([key])+' AND train_status = '+list_to_value_string([code_table.model_status_predictable])
     result=do(command)
-#    command='SELECT `model`.`id`, `model`.`name`, `user`.`email` FROM `model_users`, `model`, `user` WHERE `model_users`.`model_id` = `model`.`id` AND `model`.`key` = `user`.`key` AND `model_users`.`key` = '+list_to_value_string([key])+' AND `model`.`train_status` = '+list_to_value_string([code_table.model_status_predictable])
-#    result+=do(command)
+    command='SELECT `model`.`id`, `model`.`name`, `user`.`email` FROM `model_users`, `model`, `user` WHERE `model_users`.`model_id` = `model`.`id` AND `model`.`key` = `user`.`key` AND `model_users`.`key` = '+list_to_value_string([key])+' AND `model`.`train_status` = '+list_to_value_string([code_table.model_status_predictable])
+    result+=do(command)
     return result
 
 
@@ -161,6 +170,28 @@ def get_class_label(model_id):
     command='select class_label from model where id='+list_to_value_string([model_id])
     result=do(command)
     return result[0]['class_label']
+
+
+
+#========== TRADE SYSTEM ==========#
+def is_model_buyable(model_id):
+    command='select * from model where (train_status='+list_to_value_string([code_table.model_status_improve])+' OR train_status='+list_to_value_string([code_table.model_status_predictable])+') and share='+list_to_value_string(['1'])
+    result=do(command)
+    return result
+def share_model(model_id, share):
+    command='update model set share='+list_to_value_string([share])+' where id='+list_to_value_string([model_id])
+    result= do(command)
+    return result
+def model_store():
+    command='select id, model.name, email from model, user where `model`.`key`=`user`.`key` and (train_status='+list_to_value_string([code_table.model_status_improve])+' OR train_status='+list_to_value_string([code_table.model_status_predictable])+') and share='+list_to_value_string(['1'])
+    result=do(command)
+    return result
+def model_import(model_id, key):
+    command='insert into model_users values('+list_to_value_string([model_id, key, code_table.model_permission_predict])+')'
+    result=do(command)
+    return result
+
+
 
 
 

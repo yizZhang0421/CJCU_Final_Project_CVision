@@ -25,6 +25,11 @@ model_status_predictable=0
 model_status_first_train=1
 model_status_improve=2
 
+
+#========== TRADE SYSTEM ==========#
+error_model_unbuyable={'status':901, 'message':'model un-buyable.'}
+
+
 model_permission_denyall=0
 model_permission_owner=31 #11111, means all, five permission
 model_permission_predict=1
