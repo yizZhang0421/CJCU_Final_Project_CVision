@@ -1,18 +1,9 @@
-�w�ק�.gitignore
-�ثe���p����add . �N�i�H�F
+<h3>摘要</h3>
+客製化影像辨識服務目標為讓使用者不需要懂深度學習的相關知識就能輕鬆使用影像辨識的功能,只需要將影像資料標記答案並上傳,就能建構出
+該類影像的分類模型,且建構完成的成品及其所準備的資料集可以讓使用者相互交易。</br>
+</br>
+<h3>動機</h3>
+在使用深度學習時,需要先建立模型才能讓模型根據給定的資料訓練分類能力,建立模型需要調整許多參數,其中層的數量、層的類型、各層中的神經元量、使用的激活函數等等都是需要調整的範圍,模型的架構會影響訓練的效率及效果,要調好參數需要有一些經驗及相關知識,是使用深度學習比較困難的部分,因此我們的專題發想就是以解決該問題為出發點,目標為讓使用者完全不需要懂相關知識,只要把資料準備好就能夠完成影像辨識功能的建立。
 
-�u�|�[�J
-app/src/.
-app/build.gradle
-PythonServer/*.txt
-PythonServer/*.sql
-PythonServer/*.json
-PythonServer/*.py
-UML/*
-web/*
-build.gradle
-�M�U�ؿ���.gitignore��
-
-#===========================#
-Document: https://documenter.getpostman.com/view/4347907/S1EJXgnf
-#===========================#
+<h3>展示</h3>
+<iframe src="https://drive.google.com/file/d/10oF2IEUe96DW1vNPdcxHIKTb-2_om4m2/preview" width="640" height="480"></iframe>
