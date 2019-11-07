@@ -6,4 +6,4 @@
 在使用深度學習時,需要先建立模型才能讓模型根據給定的資料訓練分類能力,建立模型需要調整許多參數,其中層的數量、層的類型、各層中的神經元量、使用的激活函數等等都是需要調整的範圍,模型的架構會影響訓練的效率及效果,要調好參數需要有一些經驗及相關知識,是使用深度學習比較困難的部分,因此我們的專題發想就是以解決該問題為出發點,目標為讓使用者完全不需要懂相關知識,只要把資料準備好就能夠完成影像辨識功能的建立。
 
 <h3>展示</h3>
-<iframe src="https://drive.google.com/file/d/10oF2IEUe96DW1vNPdcxHIKTb-2_om4m2/preview" width="640" height="480"></iframe>
+[https://drive.google.com/file/d/10oF2IEUe96DW1vNPdcxHIKTb-2_om4m2/preview]
