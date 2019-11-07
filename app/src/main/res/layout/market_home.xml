@@ -17,25 +17,24 @@
             android:layout_height="wrap_content"
             android:background="#eeeeee"
             android:orientation="vertical">
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp"
                 android:layout_marginTop="7dp"
                 android:layout_marginBottom="7dp"
                 android:background="@drawable/market_serach_rect">
-
                 <ImageView
+                    android:id="@+id/store_search"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
-                    android:layout_gravity="center"
+                    android:layout_centerVertical="true"
                     android:layout_marginLeft="15dp"
                     android:src="@drawable/market_ic_search"/>
-
                 <com.cjcu.ima105.cvision.market.customfonts.EditText_Roboto_Regular
-                    android:id="@+id/edittext"
+                    android:id="@+id/store_keyword"
+                    android:layout_toRightOf="@+id/store_search"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="搜尋模型、資料集"
@@ -44,8 +43,16 @@
                     android:textColorHint="#363636"
                     android:inputType="text"
                     android:textSize="11dp"/>
+                <ImageView
+                    android:id="@+id/store_clear_keyword"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_centerVertical="true"
+                    android:layout_alignRight="@+id/store_keyword"
+                    android:layout_marginRight="15dp"
+                    android:src="@drawable/market_cancel"/>
 
-            </LinearLayout>
+            </RelativeLayout>
 
         </LinearLayout>
 

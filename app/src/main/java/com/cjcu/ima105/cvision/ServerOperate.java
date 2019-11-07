@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -22,7 +23,7 @@ import java.util.Iterator;
 
 public class ServerOperate {
     public static final String SERVER_PROTOCOL="http";
-    public static final String SERVER_ADDRESS="192.168.0.102";
+    public static final String SERVER_ADDRESS="192.168.43.178";
     public static final int SERVER_PORT=8080;
     private static String full_server_prefix=SERVER_PROTOCOL+"://"+SERVER_ADDRESS+":"+SERVER_PORT+"/";
 
@@ -268,6 +269,169 @@ public class ServerOperate {
         }
         return result.get(0);
     }
+    public static HashMap<String, String> get_label_info(String label_id){
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("label_id",label_id);
+        String response = do_server_operate("get_label_info",hashMap);
+        ArrayList<HashMap<String, String>> result = null;
+        try {
+            result = multi_result((JSONArray) new JSONObject(response).get("data"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result.get(0);
+    }
+    public static byte[] get_image(String key, String label_id, String image_id, String type){
+        byte[] imageBytes = null;
+        try{
+            URL url = new URL(ServerOperate.SERVER_PROTOCOL+"://"+ServerOperate.SERVER_ADDRESS+":"+ServerOperate.SERVER_PORT+"/get_image?key="+CurrentPosition.key+"&label_id="+label_id+"&image_id="+image_id+"&type="+type);
+            imageBytes = IOUtils.toByteArray(url.openStream());
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return imageBytes;
+    }
+
+    /********************   TRADE SYSTEM  *********************/
+    public static MessageServerResponse share_model(String key, String model_id, boolean share){
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("key",key);
+        hashMap.put("model_id",model_id);
+        if(share){
+            hashMap.put("share","1");
+        }
+        else{
+            hashMap.put("share","0");
+        }
+        String response = do_server_operate("share_model",hashMap);
+        int status_code = -2;
+        String message = null;
+        try {
+            message = new JSONObject(response).get("message").toString();
+            status_code = Integer.parseInt(new JSONObject(response).get("status").toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return new MessageServerResponse(status_code, message);
+    }
+    public static ArrayList<HashMap<String, String>> model_store(String keyword){
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("keyword", keyword);
+        String response = do_server_operate("model_store", hashMap);
+        ArrayList<HashMap<String, String>> result = null;
+        try {
+            result = multi_result((JSONArray) new JSONObject(response).get("data"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    public static ArrayList<HashMap<String, String>> model_samples(String model_id, String bound){
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("model_id",model_id);
+        String response="";
+        if(bound!=null){
+            response = do_server_operate("model_samples?bound="+bound,hashMap);
+        }
+        else{
+            response = do_server_operate("model_samples",hashMap);
+        }
+        ArrayList<HashMap<String, String>> result = null;
+        try {
+            result = multi_result((JSONArray) new JSONObject(response).get("data"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    public static MessageServerResponse model_import(String key, String model_id){
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("key",key);
+        hashMap.put("model_id",model_id);
+        String response = do_server_operate("model_import",hashMap);
+        int status_code = -2;
+        String message = null;
+        try {
+            message = new JSONObject(response).get("message").toString();
+            status_code = Integer.parseInt(new JSONObject(response).get("status").toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return new MessageServerResponse(status_code, message);
+    }
+    public static MessageServerResponse share_label(String key, String label_id, boolean share){
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("key",key);
+        hashMap.put("label_id",label_id);
+        if(share){
+            hashMap.put("share","1");
+        }
+        else{
+            hashMap.put("share","0");
+        }
+        String response = do_server_operate("share_label",hashMap);
+        int status_code = -2;
+        String message = null;
+        try {
+            message = new JSONObject(response).get("message").toString();
+            status_code = Integer.parseInt(new JSONObject(response).get("status").toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return new MessageServerResponse(status_code, message);
+    }
+    public static ArrayList<HashMap<String, String>> label_store(String keyword){
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("keyword", keyword);
+        String response = do_server_operate("label_store", hashMap);
+        ArrayList<HashMap<String, String>> result = null;
+        try {
+            result = multi_result((JSONArray) new JSONObject(response).get("data"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    public static ArrayList<HashMap<String, String>> label_samples(String label_id, String bound){
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("label_id",label_id);
+        String response="";
+        if(bound!=null){
+            response = do_server_operate("label_samples?bound="+bound,hashMap);
+        }
+        else{
+            response = do_server_operate("label_samples",hashMap);
+        }
+        ArrayList<HashMap<String, String>> result = null;
+        try {
+            result = multi_result((JSONArray) new JSONObject(response).get("data"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    public static MessageServerResponse label_import(String key, String from_label, String to_label){
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("key",key);
+        hashMap.put("from_label",from_label);
+        hashMap.put("to_label",to_label);
+        String response = do_server_operate("label_import",hashMap);
+        int status_code = -2;
+        String message = null;
+        try {
+            message = new JSONObject(response).get("message").toString();
+            status_code = Integer.parseInt(new JSONObject(response).get("status").toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return new MessageServerResponse(status_code, message);
+    }
+
+
+
+
+
+
 
 
 
@@ -288,13 +452,15 @@ public class ServerOperate {
                     httpURLConnection.setRequestProperty("Charsert", "UTF-8");
                     DataOutputStream output = new DataOutputStream(httpURLConnection.getOutputStream());
                     String output_string="";
-                    for(String key : params.keySet()){
-                        output_string+=key+"="+URLEncoder.encode(params.get(key), "utf-8")+"&";
+                    for (String key : params.keySet()) {
+                        output_string += key + "=" + URLEncoder.encode(params.get(key), "utf-8") + "&";
                     }
-                    output_string=output_string.substring(0, output_string.length()-1);
-                    output.writeBytes(output_string);
-                    output.flush();
-                    output.close();
+                    if(output_string.length()!=0) {
+                        output_string = output_string.substring(0, output_string.length() - 1);
+                        output.writeBytes(output_string);
+                        output.flush();
+                        output.close();
+                    }
 
                     String response = new String(IOUtils.readInputStreamFully(httpURLConnection.getInputStream()), "UTF-8");
 

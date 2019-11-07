@@ -6,23 +6,24 @@ package com.cjcu.ima105.cvision.market.ModelClass;
 
 public class HomeTopAppsModelClass {
 
-    Integer image;
-    String number,title,view,install, description;
+    String image, number,title,view,install, description, id, market;
 
-    public HomeTopAppsModelClass(Integer image, String number, String title, String view, String install, String description) {
+    public HomeTopAppsModelClass(String image, String number, String title, String view, String install, String description, String id, String market) {
         this.image = image;
         this.number = number;
         this.title = title;
         this.view = view;
         this.install = install;
         this.description=description;
+        this.id=id;
+        this.market=market;
     }
 
-    public Integer getImage() {
+    public String getImage() {
         return image;
     }
 
-    public void setImage(Integer image) {
+    public void setImage(String image) {
         this.image = image;
     }
 
@@ -60,5 +61,13 @@ public class HomeTopAppsModelClass {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getMarket() {
+        return market;
     }
 }

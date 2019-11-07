@@ -1,178 +1,364 @@
-from mysql import connector
-import os, shutil
+import library as lib
 
-'''
-android need check server access is OK, maybe at begining or anytime.
-synchronize local file system, so if you change db item, local file would be changed too.
-'''
-def user_list():
-    command='select email from user'
-    result=do(command)
-    return result
 
-def check_user_exist(mail, name):
-    command='select * from user where email='+'"'+mail+'"'
+def register(mail, name):
+    command='select user.key from user where email='+list_to_value_string([mail])
     result=do(command)
     if len(result)==0:
-        command='insert into user value('+list_to_value_string([mail,name])+')'
+        key=id_hash_string()
+        command='insert into user values('+list_to_value_string([key, mail, name])+')'
+        do(command)
+        command='select user.key from user where email='+list_to_value_string([mail])
         result=do(command)
-        os.makedirs(mail)
+        return result
+    else:
+        return result
+    
+def get_key(mail):
+    command='select user.key from user where email='+list_to_value_string([mail])
+    result=do(command)
     return result
 
-def create_model(owner_email, name):
-    id=id_hash_string()
-    command='insert into model(`id`,`owner_email`,`name`) value('+list_to_value_string([id,owner_email,name])+')'
+def is_key_exist(key):
+    command='select * from user where user.key='+list_to_value_string([key])
     result=do(command)
-    command='insert into model_users value('+list_to_value_string([id,owner_email])+')'
-    do(command)
-    if result=='OK':
-        os.makedirs(owner_email+'/'+id)
     return result
-    
-        
-def delete_model(mail, id):
-    command='delete from model where id='+list_to_value_string([id])
+
+def create_model(key, name):
+    id=id_hash_string()
+    command='insert into model(`id`, `key`, `name`) values('+list_to_value_string([id, key, name])+')'
     result=do(command)
-    shutil.rmtree(mail+'/'+id)
+    return result
+
+def model_list(key):
+    command='select id, name, acc, loss from model where model.key='+list_to_value_string([key])+' and train_status not in (1,2)'
+    result=do(command)
+    return result
+
+def get_model_info(model_id):
+    command='SELECT `model`.`name`, `model`.`size`, `model`.`acc`, `model`.`loss`, `model`.`class_label`, `model`.`share`, `user`.`email` FROM `model`, `user` WHERE `model`.`key` = `user`.`key` AND `model`.`id` = '+list_to_value_string([model_id])
+    result=do(command)
+    return result
+
+def get_label_info(label_id):
+    command='select share from label where id='+list_to_value_string([label_id])
+    result=do(command)
+    return result
+
+def get_model_key(model_id):
+    command='select model.key from model where id='+list_to_value_string([model_id])
+    result=do(command)
+    if len(result)==0:
+        return ''
+    return result[0]['key']
+        
+def delete_model(model_id):
+    labelid_name=label_list(model_id)
+    command='delete from model where id='+list_to_value_string([model_id])
+    result=do(command)
+    try:
+        lib.os.remove('models/'+model_id+'.h5')
+    except:
+        pass
+    for label in labelid_name:
+        lib.shutil.rmtree('labels/'+label['id'])
+    return result
+
+def is_model_exist(model_id):
+    command='select * from model where model.id='+list_to_value_string([model_id])
+    result=do(command)
     return result
     
 def rename_model(id, newname):
-    command='update model set name='+list_to_value_string([newname])+' where id='+list_to_value_string([id])
-    result=do(command)
-    return result
-
-def self_model_list(mail):
-    command='select id,name,acc,loss from model where owner_email='+list_to_value_string([mail])+' AND trainStatu IN ('+list_to_value_string(['0','1'])+')'
-    result=do(command)
-    return result
-
-def predict_model_list(user):
-    command='select id,name,owner_email from model,model_users where id=model_id and trainStatu=1 and user='+list_to_value_string([user])
-    result=do(command)
-    return result
-
-def training_model_list(mail):
-    command='select id,name from model where owner_email='+list_to_value_string([mail])+' AND trainStatu='+list_to_value_string(['2'])
-    result=do(command)
-    return result
+    pass
 
 def add_model_user(id,user):
-    command='insert into model_users value ('+list_to_value_string([id,user])+')'
-    result=do(command)
-    return result
+    pass
     
 def model_size(id):
-    command='select size from model where id='+list_to_value_string([id])
-    result=do(command)
-    return result
+    pass
 
-def create_label(owner_email, name, model_id):
+def create_label(name, model_id):
     id=id_hash_string()
-    command='insert into label value('+list_to_value_string([id,name,model_id])+')'
+    command='insert into label values('+list_to_value_string([id, name, model_id, '0'])+')'
     result=do(command)
-    command='insert into label_group value('+list_to_value_string([id,id])+')'
-    do(command)
-    if result=='OK':
-        os.makedirs(owner_email+'/'+model_id+'/'+id)
-    return result
-
-def delete_label(owner_email, model_id, id):
-    command='delete from label where id='+list_to_value_string([id])
-    result=do(command)
-    if result=='OK':
-        shutil.rmtree(owner_email+'/'+model_id+'/'+id)
+    lib.os.mkdir('labels/'+id)
     return result
 
 def rename_label(id, newname):
-    command='update label set name='+list_to_value_string([newname])+' where id='+list_to_value_string([id])
+    pass
+
+def label_list(model_id):
+    command='select id, name from label where model_id='+list_to_value_string([model_id])
     result=do(command)
     return result
 
-def model_label_list(model_id):
-    command='select id,name from label where model_id='+list_to_value_string([model_id])
+def delete_label(label_id):
+    command='delete from label where id='+list_to_value_string([label_id])
+    result=do(command)
+    lib.shutil.rmtree('labels/'+label_id)
+    return result
+
+def is_label_exist(label_id):
+    command='select * from label where id='+list_to_value_string([label_id])
     result=do(command)
     return result
 
-def all_label_list(mail):
-    command='select model.name as modelname,model_id,label.name as labelname,label.id from model,label where model.id=label.model_id and owner_email='+list_to_value_string([mail])
-    result=do(command)
-    return result
-
-def import_label(import_label_id,into_label_id):
-    command='insert into label_group value('+list_to_value_string([into_label_id,import_label_id])+')'
-    result=do(command)
-    return result
-
-def label_images(label_id):
-    command='SELECT model_id,add_label from `label`,`label_group` where `label_group`.`add_label`=`label`.`id` and label_id='+list_to_value_string([label_id])
-    result=do(command)
-    return result
-
-def change_model_statu(model_id, statu):
-    command='update model set trainStatu='+list_to_value_string([statu])+' where id='+list_to_value_string([model_id])
-    result=do(command)
-    return result
-
-def change_model_detail(model_id, size, acc, loss):
-    command='update model set size='+list_to_value_string([size])+' , acc='+list_to_value_string([acc])+' , loss='+list_to_value_string([loss])+' where id='+list_to_value_string([model_id])
-    result=do(command)
-    return result
-
-def update_model_label_class(model, dict_string, acc_list):
-    command='select model_id from label_class where model_id='+list_to_value_string([model])
+def get_label_key(label_id):
+    command='select model.key from model, label where label.model_id=model.id and label.id='+list_to_value_string([label_id])
     result=do(command)
     if len(result)==0:
-        dict_string=dict_string.replace('"','\\"')
-        acc_list=acc_list.replace('"','\\"')
-        command='insert into label_class value('+list_to_value_string([model, dict_string, acc_list])+')'
-        result=do(command)
-    else:
-        dict_string=dict_string.replace('"','\\"')
-        acc_list=acc_list.replace('"','\\"')
-        command='update label_class set dict_string='+list_to_value_string([dict_string])+' , acc_list='+list_to_value_string([acc_list])+' where model_id='+list_to_value_string([model])
-        result=do(command)
-    return result
+        return ''
+    return result[0]['key']
 
-def is_model_trained(model):
-    command='select model_id from label_class where model_id='+list_to_value_string([model])
+def get_label_model_id(label_id):
+    command='select model_id from label where id='+list_to_value_string([label_id])
     result=do(command)
     if len(result)==0:
-        return False
-    else:
-        return True
+        return ''
+    return result[0]['model_id']
 
-def label_class(model):
-    command='select dict_string from label_class where model_id='+list_to_value_string([model])
+def progress_list(key):
+    command='select id, name from model where model.key='+list_to_value_string([key])+' and train_status in (1,2)'
     result=do(command)
     return result
 
+def predictable_model_list(key):
+    command='SELECT `model`.`id`, `model`.`name`, `user`.`email` FROM `model`, `user` WHERE `model`.`key` = `user`.`key` AND `model`.`key` = '+list_to_value_string([key])+' AND train_status = '+list_to_value_string([lib.code_table.model_status_predictable])
+    result=do(command)
+    return result
+
+def train_model(model_id):
+    current_model_status=get_model_status(model_id)
+    if current_model_status==lib.code_table.model_status_None:
+        command='update model set train_status='+list_to_value_string([lib.code_table.model_status_first_train])+' where id='+list_to_value_string([model_id])
+    elif current_model_status==lib.code_table.model_status_predictable:
+        command='update model set train_status='+list_to_value_string([lib.code_table.model_status_improve])+' where id='+list_to_value_string([model_id])
+    result=do(command)
+    return result
+def train_model_stop(model_id):
+    current_model_status=get_model_status(model_id)
+    if current_model_status==lib.code_table.model_status_first_train:
+        command='update model set train_status='+list_to_value_string([lib.code_table.model_status_None])+' where id='+list_to_value_string([model_id])
+    elif current_model_status==lib.code_table.model_status_improve:
+        command='update model set train_status='+list_to_value_string([lib.code_table.model_status_predictable])+' where id='+list_to_value_string([model_id])
+    result=do(command)
+    return result
+def train_model_finish(model_id):
+    command='update model set train_status='+list_to_value_string([lib.code_table.model_status_predictable])+' where id='+list_to_value_string([model_id])
+    result=do(command)
+    return result
+def get_model_status(model_id):
+    command='select train_status from model where id='+list_to_value_string([model_id])
+    result=do(command)
+    return result[0]['train_status']
+def fill_model_details(model_id, size, acc, loss, class_label):
+    command='update model set size='+list_to_value_string([size])+', acc='+list_to_value_string([acc])+', loss='+list_to_value_string([loss])+', class_label='+list_to_value_string([class_label])+' where id='+list_to_value_string([model_id])
+    result=do(command)
+    return result
+
+def get_class_label(model_id):
+    command='select class_label from model where id='+list_to_value_string([model_id])
+    result=do(command)
+    return result[0]['class_label']
+
+#=== lists ===#
+def get_progress(model_id):
+    command='select epoch, acc, loss from progress_list where model_id='+list_to_value_string([model_id])
+    result=do(command)
+    return result
+def update_progress(model_id, epoch, acc, loss):
+    if len(get_progress(model_id))==0:
+        if acc==None:
+            command='insert into progress_list(model_id, epoch) values('+list_to_value_string([model_id, epoch])+')'
+        else:
+            command='insert into progress_list(model_id, epoch, acc, loss) values('+list_to_value_string([model_id, epoch, acc, loss])+')'
+        result=do(command)
+    else:
+        if acc==None:
+            command='update progress_list set epoch='+list_to_value_string([epoch])+' where model_id='+list_to_value_string([model_id])
+        else:
+            command='update progress_list set epoch='+list_to_value_string([epoch])+', acc='+list_to_value_string([acc])+', loss='+list_to_value_string([loss])+' where model_id='+list_to_value_string([model_id])
+        result=do(command)
+    return result
+def optim_progress(model_id, pid):
+    command='update progress_list set pid='+list_to_value_string([pid])+' where model_id='+list_to_value_string([model_id])
+    result=do(command)
+    return result
+def get_progress_pid(model_id):
+    command='select pid from progress_list where model_id='+list_to_value_string([model_id])
+    result=do(command)
+    return result[0]['pid']
+def remove_progress(model_id):
+    command='delete from progress_list where model_id='+list_to_value_string([model_id])
+    result=do(command)
+    return result
+def add_predict(model_id, predict):
+    command='insert into predict_list values('+list_to_value_string([model_id, predict])+')'
+    result=do(command)
+    return result
+def get_predict(model_id):
+    command='select result from predict_list where model_id='+list_to_value_string([model_id])
+    result=do(command)
+    return result
+def remove_predict(model_id):
+    command='delete from predict_list where model_id='+list_to_value_string([model_id])
+    result=do(command)
+    return result
+    
+
+
+
+#========== TRADE SYSTEM ==========#
+def is_model_buyable(model_id):
+    command='select * from model where (train_status='+list_to_value_string([lib.code_table.model_status_improve])+' OR train_status='+list_to_value_string([lib.code_table.model_status_predictable])+') and share='+list_to_value_string(['1'])
+    result=do(command)
+    return result
+def share_model(model_id, share):
+    command='update model set share='+list_to_value_string([share])+' where id='+list_to_value_string([model_id])
+    result= do(command)
+    return result
+def model_store(keyword):
+    command='select id, model.name, email from model, user where `model`.`key`=`user`.`key` and (train_status='+list_to_value_string([lib.code_table.model_status_improve])+' OR train_status='+list_to_value_string([lib.code_table.model_status_predictable])+') and share='+list_to_value_string(['1'])+' and (`model`.`name` LIKE BINARY "%'+keyword+'%" or `user`.`email` LIKE BINARY "%'+keyword+'%")'
+    result=do(command)
+    for i in result:
+        i['description']='None'
+    return result
+def model_samples(model_id, bound=None):
+    samples=[]
+    for j in label_list(model_id):
+        image_id=lib.os.listdir('labels/'+j['id'])[0]
+        if bound==None:
+            samples.append({
+                    'name': j['name'],
+                    'base64': str(lib.base64.b64encode(open('labels/'+j['id']+'/'+image_id, 'rb').read()).decode())
+                    })
+        else:
+            img=lib.cv2.imread('labels/'+j['id']+'/'+image_id)
+            if img.shape[0]>img.shape[1]:
+                img=lib.cv2.resize(img, (int(bound*img.shape[1]/img.shape[0]), bound), interpolation=lib.cv2.INTER_AREA)
+            elif img.shape[0]<img.shape[1]:
+                img=lib.cv2.resize(img, (bound, int(bound*img.shape[0]/img.shape[1])), interpolation=lib.cv2.INTER_AREA)
+            lib.cv2.imwrite('D:/Desktop/test.jpg', img)
+            img=lib.cv2.imencode('.jpg', img)[1].tostring()
+            base64=str(lib.base64.b64encode(img).decode())
+            samples.append({
+                    'name': j['name'],
+                    'base64': base64
+                    })
+    return samples
+def model_import(model_id, key):
+    new_model_id=id_hash_string()
+    lib.copyfile('models/'+model_id+'.h5', 'models/'+new_model_id+'.h5')    
+    info=get_model_info(model_id)[0]
+    command='insert into model values('+list_to_value_string([new_model_id, key, info['name'], info['size'], info['acc'], info['loss'], str(lib.code_table.model_status_copying), info['class_label'].replace('"', '\\"'), '0'])+')'
+    result=do(command)
+    old_labels=label_list(model_id)
+    for i in old_labels:
+        new_label_id=id_hash_string()
+        command='insert into label values('+list_to_value_string([new_label_id, i['name'], new_model_id, '0'])+')'
+        do(command)
+        lib.os.mkdir('labels/'+new_label_id)
+        open('labels/'+new_label_id+'/'+id_hash_string()+'.jpg', 'wb').write(open('labels/'+i['id']+'/'+lib.os.listdir('labels/'+i['id'])[0], 'rb').read())
+    
+    command='update model set train_status='+list_to_value_string(['0'])+' where id='+list_to_value_string([new_model_id])
+    result=do(command)
+    return result
+def share_label(label_id, share):
+    command='update label set share='+list_to_value_string([share])+' where id='+list_to_value_string([label_id])
+    result= do(command)
+    return result
+def label_store(keyword):
+    command='select label.id, label.name, email from label, model, user where `label`.`model_id`=`model`.`id` and `model`.`key`=`user`.`key` and `label`.`share`='+list_to_value_string(['1'])+' and (`label`.`name` LIKE BINARY "%'+keyword+'%" OR `model`.`name` LIKE BINARY "%'+keyword+'%" OR `user`.`email` LIKE "%'+keyword+'%")'
+    result=do(command)
+    filter_result=[]
+    for i in result:
+        image_list=lib.os.listdir('labels/'+i['id'])
+        if len(image_list)!=0:
+            i['description']=str(len(image_list))+'張'
+            filter_result.append(i)
+    return filter_result
+def label_samples(label_id, bound=None):
+    samples=[]
+    image_list=lib.os.listdir('labels/'+label_id)
+    try:
+        for i in range(3):
+            if bound==None:
+                samples.append({
+                        'name': '',
+                        'base64': str(lib.base64.b64encode(open('labels/'+label_id+'/'+image_list[i], 'rb').read()).decode())
+                        })
+            else:
+                img=lib.cv2.imread('labels/'+label_id+'/'+image_list[i])
+                if img.shape[0]>img.shape[1]:
+                    img=lib.cv2.resize(img, (int(bound*img.shape[1]/img.shape[0]), bound), interpolation=lib.cv2.INTER_AREA)
+                elif img.shape[0]<img.shape[1]:
+                    img=lib.cv2.resize(img, (bound, int(bound*img.shape[0]/img.shape[1])), interpolation=lib.cv2.INTER_AREA)
+                img=lib.cv2.imencode('.jpg', img)[1].tostring()
+                base64=str(lib.base64.b64encode(img).decode())
+                samples.append({
+                        'name': '',
+                        'base64': base64
+                        })
+    except:
+        pass
+    return samples
+def label_import(source_label, destination_label):
+    for file in lib.os.listdir('labels/'+source_label):
+        lib.copyfile('labels/'+source_label+'/'+file, 'labels/'+destination_label+'/'+file)
+
+
+#======= training queue ========#
+def get_training_count():
+    command='select model_id from progress_list where epoch!='+list_to_value_string(['In waiting queue'])
+    result=do(command)
+    return len(result)
+def train_queue_add(model_id):
+    ms=int(round(lib.time.time() * 1000))
+    command='insert into train_queue values('+list_to_value_string([model_id, str(ms)])+')'
+    result=do(command)
+    return result
+def get_train_queue_content():
+    command='select model_id from `train_queue` ORDER by `ms` ASC'
+    result=do(command)
+    return result
+def train_queue_pop():
+    q=get_train_queue_content()
+    first=q[0]['model_id']
+    command='delete from train_queue where model_id='+list_to_value_string([first])
+    do(command)
+    return first
+#======== predict queue ========#
+def get_predicting_count():
+    command='select model_id from progress_list'
+    result=do(command)
+    return len(result)
+def predict_queue_add(model_id, image_id):
+    ms=int(round(lib.time.time() * 1000))
+    command='insert into predict_queue values('+list_to_value_string([model_id, image_id, str(ms)])+')'
+    result=do(command)
+    return result
+def get_predict_queue_content():
+    command='select model_id, image_id from `predict_queue` ORDER by `ms` ASC'
+    result=do(command)
+    return result
+def predict_queue_pop():
+    q=get_predict_queue_content()
+    first=(q[0]['model_id'], q[0]['image_id'])
+    command='delete from predict_queue where model_id='+list_to_value_string([first[0]])
+    do(command)
+    return first
 
 
 
 
 
-
-
-def filesys_db_sync():
-    mail_list=user_list()
-    for user in mail_list:
-        os.makedirs(user['email'])
-        model_list=self_model_list(user['email'])
-        for model in model_list:
-            os.makedirs(user['email']+'/'+model['id'])
-            label_list=model_label_list(model['id'])
-            for label in label_list:
-                os.makedirs(user['email']+'/'+model['id']+'/'+label['id'])
-    return 'OK'
-
-import uuid, time
 def id_hash_string():
-    ms=int(round(time.time() * 1000))
-    id = str(ms)+'-'+str(uuid.uuid4())
-    return id
-
+    ms=int(round(lib.time.time() * 1000))
+    id = str(ms)+'-'+str(lib.uuid.uuid4())
+    return id.upper()
 def do(command):
-    db=connector.connect(host="localhost",database='cvision',user="root",passwd="")
+    db=lib.connector.connect(host="localhost",database='cvision',user="root",passwd="")
     cursor=db.cursor()
     try:
         cursor.execute(command)
@@ -184,20 +370,18 @@ def do(command):
         dictionary = [dict(zip(columns, row)) for row in cursor.fetchall()]
         db.close()
         return dictionary
-    except connector.IntegrityError as err:
+    except lib.connector.IntegrityError as err:
         #error no reference: https://dev.mysql.com/doc/refman/8.0/en/server-error-reference.html
         db.close()
         return str(err.errno)
 def list_to_value_string(list):
     string=''
     for value in list:
-        string+='"'+value+'",'
+        string+='"'+str(value)+'",'
     string=string[:-1]
     return string
+
     
-
-
-
 
 
 

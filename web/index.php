@@ -13,8 +13,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-
-
     <link href="//cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.10/alertify.core.css" rel="stylesheet">
     <link href="//cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.10/alertify.default.css" rel="stylesheet">
     <script src="//cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.10/alertify.min.js"></script>
@@ -24,7 +22,7 @@
     include('global_config.php')
     ?>
 
-    <title>客製化影像辨識</title>
+    <title>CVision</title>
     <script type="text/javascript">
         /* <![CDATA[ */
         function addLoadEvent(func) {
@@ -49,10 +47,11 @@
 
     <style type="text/css">
         img.wp-smiley,
+        .alertify{
+            top : 0;
+            font-size:2.6vh;
+        }
     </style>
-    <link rel='stylesheet' id='all-css-0-1'
-        href='https://s2.wp.com/_static/??-eJyNU1ty2zAMvFAQNg+3X52chaQgCTYpcAjKrm9fUEoU13bY/GgAaBeLF80pgeep4FRMnCGFeaBJzCl5jiCRAp6vvEcv8mDu02R24jOlQqxezyHwqYUf+YgZ3OxcQGWXc8ANTpMPc6dhDZjOykiaQB4jTbeQvZii/w+O/2xGSzfQobKwJOsPsHhf6JIU4wIvKJdtPr9XeVnGHQHbKQCcze+z2/yVRGbisvSzGa1snjNqPCZbKiJiRxYDRoW1aDH9/GBVc9RemzJrqc6ljCKg30hzhDKq0C1vDZs0O5Nt5wP1PcLz1Q7/A7YiWNZBLzP+toruaFWCpeZmU9QNVQRn/csHQgj2ZArGFGy5ObpGAmFPNsC6tUunRR6QQTuz9UH840AfLOUWVQ8DLw4Jjs8tdEad4KDmsIzz022RCgtkTJwL9Jzjtf+9A49WCuZaYX3MmerT2WLNFL4OoqbYrK/2P76aIbCzoQLe4u+n3e7H7mn38vpr/xeIoMk8?cssminify=yes'
-        type='text/css' media='all' />
     <style id='wpcom-admin-bar-inline-css' type='text/css'>
         .admin-bar {
             position: inherit !important;
@@ -103,12 +102,9 @@
         }
 
         #footerImg:hover {
-
             transition-property: -webkit-filter;
             transition-duration: 0.3s;
             -webkit-filter: blur(0px) brightness(100%) opacity(100%);
-
-
         }
 
         .footerText {
@@ -133,20 +129,16 @@
             font-size: 13px;
             font-family: 'proxima-nova', sans-serif;
             color: #f2f2f2;
-
         }
-
         #Signin,#signout{
-
             font-size : 1vw ;
-
         }
     </style>
 </head>
 
 <body>
     <script>
-        var ip = "<?php echo $base_url; ?>";
+        var ip = "<?php echo $base_url; ?>";  
         var Name = "";
         var Mail = "";
         var login_json = Object;
@@ -154,7 +146,7 @@
         var key = "";
         var client_id = "488772557570-m50f06mgi4lqnkki7jevo3cjkgtqercc.apps.googleusercontent.com";
         var registered_bool = false;
-        function onSignIn(googleUser) {
+        function onSignIn(googleUser) {        
             // Useful data for your client-side scripts:            
             var profile = googleUser.getBasicProfile();
             Name = profile.getName();
@@ -162,9 +154,9 @@
             //login_json = { "mail": Mail, "name": Name };
             document.getElementById("Signin").innerHTML = Name + " 你好！";
             document.getElementById("signout").innerHTML = '<div onclick="signOut()">(登出)</div>';
-            Mail = encodeURIComponent(Mail);
+            Mail = encodeURIComponent(Mail);            
             client_id = encodeURIComponent(client_id);
-            id_token = googleUser.getAuthResponse().id_token;
+            id_token = googleUser.getAuthResponse().id_token;            
             id_token = encodeURIComponent(id_token);
             $.post({
                 url: ip + 'get_key',
@@ -175,18 +167,20 @@
                 type: "POST",
                 // dataType: 'TEXT',
                 // contentType: "application/json; charset=utf-8",
-                success: function (msg) {
+                success: function (msg) {                   
                     msg = JSON.parse(msg);
-                    if (msg.message == "this email is un-registered, please visite cvision website to register.") {
-                        document.getElementById("registered").style.display = "block";                        
-                    }
-                    else if (msg.message == "invalid id token, login fail.") {
+                    console.log(msg);   
+                    // if (msg.message == "this email is un-registered, please visite cvision website to register.") {
+                    //     document.getElementById("registered").style.display = "block";                        
+                    // }
+                    if (msg.message == "invalid id token, login fail.") {
                         alert("Google登入失敗")
                     }
                     else {
                         console.log(msg.data);
                         document.getElementById("model_but").style.display = "block";
                         document.getElementById("synopsis").style.display = "block";
+                        document.getElementById("store_but").style.display = "block";
                         key = msg.data.key;
                         registered_bool = true;
                         login_json = { "name": Name, "key": key, "id_token": id_token };
@@ -199,8 +193,7 @@
         };
         function signOut() {
             var auth2 = gapi.auth2.getAuthInstance();
-            auth2.signOut().then(function () {
-                
+            auth2.signOut().then(function () {                
                 window.location.href='index.php';
                 console.log('User signed out.');
             });
@@ -231,8 +224,8 @@
             else {
                 alert("請先進行註冊");
             }
-
         }
+
         function registered() {
             id_token = encodeURIComponent(id_token);
             $.post({
@@ -255,6 +248,7 @@
                         document.getElementById("model_but").style.display = "block";
                         document.getElementById("registered").style.display = "none";
                         document.getElementById("synopsis").style.display = "block";
+                        document.getElementById("store_but").style.display = "none";
                         for (var keys in login_json) {
                             if (login_json.hasOwnProperty(keys)) {
                                 var val = login_json[keys];
@@ -263,7 +257,6 @@
                             }
                         }
                     }
-
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
                 }
@@ -277,7 +270,7 @@
         }
     </script>
     <div id="page" class="site">
-        <header id="masthead" class="">
+        <header id="masthead">
             <br>
             <div align="right" style="margin-right:2%" id="signcontent">
                 <div class="g-signin2" data-onsuccess="onSignIn" data-prompt="select_account" id="Signin"
@@ -285,39 +278,43 @@
                 </div>
                 <div id='signout' style="display:inline-block; cursor:pointer;"></div>
             </div>
-            <div class="header-wrapper">
-                <div class="site-branding">
-                    <a href="index.php" class="custom-logo-link" rel="home" itemprop="url"><img width="445" height="407"
-                            src="./logo.png" class="custom-logo" alt="客製化影像辨識" itemprop="logo" /></a>
-                    <div class="site-branding-text">
-                        <h1 class="site-title"><a href="" rel="home">客製化影像辨識</a></h1>
-                    </div><!-- .site-branding-text -->
-                </div><!-- .site-branding -->
-            </div><!-- .header-wrapper -->
-            <div class="menu-wrapper">
-                <nav id="site-navigation" class="main-navigation">
-                    <div>
-                        <ul id="header-menu" class="menu">
-                            <li id="menu-item-65"
-                                class="menu-item menu-item-type-custom menu-item-object-custom menu-item-65"><a
-                                    href="">首頁</a></li>
-                            <li id="model_but" style="display: none">
-                                <a style="cursor:pointer;" onclick="doFormRequest('modellist.php','post')">模型</a></li>
 
-                            <li id="registered" style="display: none; cursor:pointer;">
-                                <a onclick="registered()">註冊</a>
+            <div style="height:auto;" class="text-center">
+                <a href="index.php"  rel="home" itemprop="url">
+                    <img width="26%" height="auto" src="./logo1.png" class="rounded" alt="客製化影像辨識" itemprop="logo" />
+                </a>
+                <div class="site-branding-text">
+                    <h1 class="site-title"><a href="index.php" rel="home">CVision</a></h1>
+                </div><!-- .site-branding-text -->
+            </div><!-- .site-branding -->        
+        </header><!-- #masthead -->
+        
+        <div class="container" style="margin-top:3%">            
+                <nav  class="navbar navbar-expand-sm navbar-light ">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNavDropdown" style="font-weight:bold;"> 
+                        <ul class="navbar-nav">
+                            <li class="nav-item active">
+                                <a href="index.php" class="nav-link active">首頁</a>
                             </li>
-                            <li id="synopsis" style="display: none; cursor:pointer;">
-                                <a onclick="Introduction()">操作說明</a>
+                            <li id="model_but" style="display: none" class="nav-item">
+                                <a style="cursor:pointer;" onclick="doFormRequest('modellist.php','post')" class="nav-link">模型</a>
+                            </li>
+                            <li id="registered" style="display: none; cursor:pointer;" class="nav-item">
+                                <a onclick="registered()" class="nav-link">註冊</a>
+                            </li>
+                            <li id="synopsis" style="display: none; cursor:pointer;" class="nav-item">
+                                <a onclick="Introduction()" class="nav-link">操作說明</a>
+                            </li>
+                            <li id="store_but" style="display: none; cursor:pointer;" class="nav-item">
+                                <a class="nav-link" onclick="doFormRequest('store.php','post')">模型分享頁面</a>
                             </li>
                         </ul>
                     </div>
                 </nav><!-- #site-navigation -->
-            </div><!-- .menu-wrapper -->
-        </header><!-- #masthead -->
-
-        <div class="container">
-            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" style="margin-top:3%">
                 <div class="carousel-inner">
                     <div class="carousel-item active">
                         <a href="https://zh.wikipedia.org/wiki/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0" title="深度學習"><img
@@ -385,17 +382,11 @@
         <footer id="colophon">
             <div class="row">
                 <div class="col-lg-1"></div>
-                <div class="col-lg-4" style="font-size:13px;margin: 1.5% 0 1.5% 0;font-family:微軟正黑體;">
-                    長榮大學資訊管理學系畢業專案發表<br>
-                    成員:尤家駿、余冠靖、張逸宗<br>
-                    指導老師:周信宏
+                <div class="col-lg-4" style="margin-top: 6%;">
+                    
                 </div>
                 <div class="col-lg-3"></div>
-                <div class="col-lg-4" style="font-size:13px;margin: 1.5% 0 0.5% 0">
-                    <a href="http://www.cjcu.edu.tw" class="logo">
-                        <img src="http://www.cjcu.edu.tw/images/logo-O1.png?v=1550022993" alt="長榮大學校徽-回首頁" width="15%">
-                        <img src="http://www.cjcu.edu.tw/images/cjcu.png?v=1550036037" alt="長榮大學書法題字" width="23%">
-                    </a>
+                <div class="col-lg-4" style="font-size:13px;margin: 1.5% 0 0.5% 0">                    
                 </div>
             </div>
         </footer>

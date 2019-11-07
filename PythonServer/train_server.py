@@ -1,156 +1,156 @@
-import os, math, random, cv2, json
-import numpy as np
-from threading import local
+import library as lib
 
-import db_operate
 
-from keras.models import Sequential
-from keras.layers import Dense,Dropout,Flatten,Conv2D,MaxPooling2D
-from keras.utils import to_categorical
-from tensorflow import Graph, Session
-
-def gen(mail, model, label_dirs, batch_size):
-    x=[]
-    y=[]
-    for label in label_dirs:
-        for img in os.listdir(mail+'/'+model+'/'+label):
-            x.append(mail+'/'+model+'/'+label+'/'+img)
-            y.append(label_dirs.index(label))
-    xy=list(zip(x,y))
-    random.shuffle(xy)
-    (x, y)=zip(*xy)
+def train_start(model_id, labels):  
+    lib.db_operate.update_progress(model_id, 'Building', None, None)
+    lib.hyper_run([i['id'] for i in labels], model_id)
     
-    x_=[]
-    y_=[]
-    for img_path, clas in zip(x, y):
-        img=cv2.imread(img_path)
-        img=cv2.resize(img,(100,100),interpolation=cv2.INTER_CUBIC)
-        img=img/255
-        x_.append(img)
-        if len(label_dirs)>2:
-            y_.append(to_categorical(int(clas), num_classes=len(label_dirs)))
-        else:
-            y_.append(int(clas))
-        if len(x_)==batch_size:
-            yield (np.array(x_), np.array(y_))
-            x_=[]
-            y_=[]
-    yield (np.array(x_), np.array(y_))
-
-def train_start(progress_dict, mail, model, batch_size, patient):
-    d=local()
-    d.graph=Graph()
-    d.session=Session(graph=d.graph)
-    d.model = Sequential()
+    d=lib.local()
+    d.config = lib.tf.ConfigProto(
+        gpu_options = lib.tf.GPUOptions(per_process_gpu_memory_fraction=0.1)
+        # device_count = {'GPU': 1}
+    )
+    d.config.gpu_options.allow_growth = True
+    d.graph=lib.Graph()
+    d.session=lib.Session(graph=d.graph, config=d.config)
+    
+    lib.db_operate.update_progress(model_id, 'Training', None, None)
     try:
         with d.graph.as_default():
             with d.session.as_default():
-                d.label_dirs=db_operate.model_label_list(model)
-                d.label_dirs=[d.label_info['id'] for d.label_info in d.label_dirs]
-                d.total_num_of_images=0
-                for d.label in d.label_dirs:
-                    d.total_num_of_images+=len(os.listdir(mail+'/'+model+'/'+d.label))
-                d.model.add(Conv2D(filters=8,
-                                 kernel_size=(3,3),
-                                 padding='same',
-                                 input_shape=(100,100,3),
-                                 activation='relu'))
-                d.model.add(MaxPooling2D(pool_size=(2,2)))
-                d.model.add(Conv2D(filters=16,
-                                 kernel_size=(3,3),
-                                 padding='same',
-                                 activation='relu'))
-                d.model.add(Conv2D(filters=16,
-                                 kernel_size=(3,3),
-                                 padding='same',
-                                 activation='relu'))
-                d.model.add(MaxPooling2D(pool_size=(2,2)))
-                d.model.add(Flatten())
-                d.model.add(Dense(2048, activation='relu'))
-                d.model.add(Dense(512, activation='relu'))
-                d.model.add(Dropout(0.25))
-                d.model.add(Dense(128, activation='relu'))
-                d.model.add(Dropout(0.25))
-                if len(d.label_dirs)==2:
-                    d.model.add(Dense(1, activation='sigmoid'))
+                d.model = lib.model_from_json(open('hyper_space/'+model_id+'.json', 'r').read())
+                if len(labels)==2:
                     d.model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
                 else:
-                    d.model.add(Dense(len(d.label_dirs), activation='softmax'))
                     d.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+                lib.os.remove('hyper_space/'+model_id+'.py')
+                lib.os.remove('hyper_space/'+model_id+'.json')
+                
+                X_train=[]
+                X_test=[]
+                y_train=[]
+                y_test=[]
+                for label in labels:
+                    x=[]
+                    y=[]
+                    for img in lib.os.listdir('labels/'+label['id']):
+                        x.append('labels/'+label['id']+'/'+img)
+                        y.append(labels.index(label))
+                    xy=list(zip(x,y))
+                    lib.random.shuffle(xy)
+                    (x, y)=zip(*xy)
+                    X_train_, X_test_, y_train_, y_test_ = lib.train_test_split(x, y, test_size=0.2)
+                    X_train+=X_train_
+                    X_test+=X_test_
+                    y_train+=y_train_
+                    y_test+=y_test_
+                
+                def gen_train(X_train, y_train):
+                    while 1:
+                        xy=list(zip(X_train,y_train))
+                        lib.random.shuffle(xy)
+                        (X_train,y_train)=zip(*xy)
+                        x=[]
+                        y=[]
+                        for img_path, clas in zip(X_train, y_train):
+                            img=lib.cv2.imread(img_path)
+                            img=lib.cv2.resize(img,(100,100),interpolation=lib.cv2.INTER_CUBIC)
+                            img=img/255
+                            x.append(img)
+                            if len(labels)>2:
+                                y.append(lib.to_categorical(int(clas), num_classes=len(labels)))
+                            else:
+                                y.append(int(clas))
+                            if len(x)==32:
+                                yield (lib.np.array(x), lib.np.array(y))
+                                x=[]
+                                y=[]
+                        yield (lib.np.array(x), lib.np.array(y))
+                def gen_val(X_test, y_test):
+                    while 1:
+                        xy=list(zip(X_test,y_test))
+                        lib.random.shuffle(xy)
+                        (X_test,y_test)=zip(*xy)
+                        x=[]
+                        y=[]
+                        for img_path, clas in zip(X_test, y_test):
+                            img=lib.cv2.imread(img_path)
+                            img=lib.cv2.resize(img,(100,100),interpolation=lib.cv2.INTER_CUBIC)
+                            img=img/255
+                            x.append(img)
+                            if len(labels)>2:
+                                y.append(lib.to_categorical(int(clas), num_classes=len(labels)))
+                            else:
+                                y.append(int(clas))
+                            if len(x)==32:
+                                yield (lib.np.array(x), lib.np.array(y))
+                                x=[]
+                                y=[]
+                        yield (lib.np.array(x), lib.np.array(y))
+                
                 d.acc=-999
                 d.epoch=0
-                d.acc_list=[]
-                d.patient_check=False
+                d.patient=3
+                #==========================================================#
                 while 1:
-                    d.history=d.model.fit_generator(gen(mail, model, d.label_dirs, batch_size), steps_per_epoch=math.ceil(d.total_num_of_images/batch_size), epochs=1, verbose=0)
+                    d.history_train=d.model.fit_generator(gen_train(X_train, y_train), steps_per_epoch=lib.math.ceil(len(X_train)/32), epochs=1, verbose=1)
+                    d.history_test=d.model.evaluate_generator(gen_val(X_test, y_test), steps=lib.math.ceil(len(X_test)/32))
                     d.epoch+=1
-                    progress_dict[model]={'epoch':d.epoch,'acc':d.history.history['acc'][0],'loss':d.history.history['loss'][0]}
-                    d.acc_list.append(str(d.history.history['acc'][0]))
-                    if (d.history.history['acc'][0]-d.acc)>=0: #delta scale
-                        d.acc=d.history.history['acc'][0]
+                    lib.db_operate.update_progress(model_id, str(d.epoch), str(d.history_test[1]), str(d.history_test[0]))
+                    if d.history_test[1]>d.acc:
+                        d.acc=d.history_test[1]
+                        continue
                     else:
-                        d.patient_check=False
-                        for i in range(patient):# epoch before break
-                            d.history=d.model.fit_generator(gen(mail, model, d.label_dirs, batch_size), steps_per_epoch=math.ceil(d.total_num_of_images/batch_size), epochs=1, verbose=0)
+                        is_update=False
+                        for i in range(d.patient):# train patient times 
+                            d.history_train=d.model.fit_generator(gen_train(X_train, y_train), steps_per_epoch=lib.math.ceil(len(X_train)/32), epochs=1, verbose=1)
+                            d.history_test=d.model.evaluate_generator(gen_val(X_test, y_test), steps=lib.math.ceil(len(X_test)/32))
                             d.epoch+=1
-                            progress_dict[model]={'epoch':d.epoch,'acc':d.history.history['acc'][0],'loss':d.history.history['loss'][0]}
-                            d.acc_list.append(str(d.history.history['acc'][0]))
-                            if (d.history.history['acc'][0]-d.acc)>0: #delta scale
-                                d.acc=d.history.history['acc'][0]
-                                d.patient_check=True
+                            lib.db_operate.update_progress(model_id, str(d.epoch), str(d.history_test[1]), str(d.history_test[0]))
+                            if d.history_test[1]>d.acc:
+                                is_update=True
+                                d.acc=d.history_test[1]
                                 break
-                        if d.patient_check:
-                            d.patient_check=False
-                            continue
-                        else:
+                        if is_update==False:
                             break
-                        
-                d.model.save(mail+'/'+model+'/'+'model.h5')
-        d.label_class={}
-        d.label_dirs=db_operate.model_label_list(model)
-        d.label_dirs=[d.label_info['name'] for d.label_info in d.label_dirs]
-        for d.label in d.label_dirs:
-            d.label_class[str(d.label_dirs.index(d.label))]=d.label
-        db_operate.update_model_label_class(model, json.dumps(d.label_class, ensure_ascii=False), json.dumps(d.acc_list, ensure_ascii=False))
-        db_operate.change_model_statu(model, '1')
-        size=os.path.getsize(mail+'/'+model+'/'+'model.h5')
+                #==========================================================#
+                d.model.save('models/'+model_id+'.h5')
+                
+        #finish fill data to database
+        size=lib.os.path.getsize('models/'+model_id+'.h5')
         size=(size/1024)/1024
-        db_operate.change_model_detail(model, str(size), str(d.history.history['acc'][0]), str(d.history.history['loss'][0]))
+        class_label=lib.json.dumps({labels.index(label):label['name'] for label in labels}, ensure_ascii=False).replace('"', '\\"')
+        lib.db_operate.fill_model_details(model_id, size, d.history_test[1], d.history_test[0], class_label)
+        lib.db_operate.train_model_finish(model_id)
+        del d.model
     except:
-        if db_operate.is_model_trained(model):
-            db_operate.change_model_statu(model, '1')
-        else:
-            db_operate.change_model_statu(model, '0')
-        print('stop')
+        lib.db_operate.train_model_stop(model_id)
+        try:
+            lib.os.remove('hyper_space/'+model_id+'.py')
+        except:
+            pass
+        try:
+            lib.os.remove('hyper_space/'+model_id+'.json')
+        except:
+            pass
+        try:
+            del d.model
+        except:
+            pass
     del d.graph
     del d.session
-    del d.model
     del d
-    del progress_dict[model]
+    lib.db_operate.remove_progress(model_id)
     #mail user finish or terminate
 
-import time
-def progress_stream(progress_dict, model):
+def progress_stream(model):
     while 1:
         try:
-            yield json.dumps(progress_dict[model], ensure_ascii=False)+'\n'
+            yield lib.json.dumps(lib.db_operate.get_progress(model)[0], ensure_ascii=False)+'\n'
         except:
             yield 'finish\n'
-        time.sleep(0.5)
+            break
+        lib.time.sleep(0.5)
 
-
-
-'''
-from multiprocessing import Process
-if __name__ == '__main__':
-    model_list=db_operate.self_model_list('z58774556@gmail.com')
-    mail='z58774556@gmail.com'
-    model='1547914894173-334481f0-5657-400d-ac2f-334a52138306'
-    batch_size=32
-    patient=0
-    a=Process(target=train, args=(mail, model, batch_size, patient))
-    a.start()
-    a.is_alive()
-'''
 
  

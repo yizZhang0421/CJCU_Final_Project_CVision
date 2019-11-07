@@ -16,7 +16,7 @@
     <link href="//cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.10/alertify.core.css" rel="stylesheet">
     <link href="//cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.10/alertify.default.css" rel="stylesheet">
     <script src="//cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.10/alertify.min.js"></script>
-    <title>客製化影像辨識</title>
+    <title>CVision</title>
 
     <?php 
         include('global_config.php');
@@ -26,40 +26,41 @@
         $model_id = $_POST['model_id'] ;
         $model_status = $_POST['model_status'];
         $id_token = $_POST['id_token'] ;
-        ?>
+    ?>
 
     <style>
         .box {
-            width: 100%;
-            height: 100%;
-            text-align: center;
+            width: 80%;
+            height: 80%;
+            margin: 0px auto;
         }
 
         .box:hover {
             transition-property: width, height;
             transition-duration: 0.3s;
-            width: 120%;
+            width: 100%;
         }
 
         #label_name:hover {
             font-size: 2.5vw;
+            text-decoration:underline;
         }
 
         #label_name,
         .deleteImg {
+            cursor:pointer;
+            color:blue;
             display: inline-block;
-            text-align: center;
+            text-align: center;                        
         }
 
         #container_actionButton {
             display: inline-block;
-
         }
 
         #identifyButton {
             display: block;
         }
-
 
         #colophon {
             background-color: #555555;
@@ -76,19 +77,18 @@
         }
 
         #footerImg:hover {
-
             transition-property: -webkit-filter;
             transition-duration: 0.3s;
             -webkit-filter: blur(0px) brightness(100%) opacity(100%);
-
-
         }
-
+        .alertify{
+            top : 0;
+            font-size:2.6vh;
+        }
         .footerText {
             font-size: 13px;
             font-family: 'proxima-nova', sans-serif;
             display: inline-block;
-
         }
 
         #Text2::before {
@@ -106,26 +106,32 @@
             font-size: 13px;
             font-family: 'proxima-nova', sans-serif;
             color: #f2f2f2;
-
         }
 
         #Signin,
         #signout {
-
             font-size: 1vw;
-
         }
 
         #div_del {
             border-right: 100px solid black;
             height: 100%;
         }
+
+        .font-family{
+            text-align :center;
+            font-family:DFKai-sb;    
+            text-align:center;    
+            cursor:pointer;      
+        }
+        .font-family:hover{
+            transition-duration: 0.2s;
+            font-weight:bold;
+        }
     </style>
 
 
     <script type="text/javascript">
-
-
         /* <![CDATA[ */
         var ip = "<?php echo $base_url; ?>";
         var name = "<?php echo $name; ?>";
@@ -133,6 +139,7 @@
         var model_id = "<?php echo $model_id; ?>";
         var id_token = "<?php echo $id_token; ?>";
         var label_json = null;
+
         function addLoadEvent(func) {
             var oldonload = window.onload;
             if (typeof window.onload != 'function') {
@@ -150,15 +157,10 @@
             getlabel_list();
             console.log(key);
         }
-
-
-
-
         function ShowHello() {
             document.getElementById('Signin').innerHTML = name + ' 你好！';
             document.getElementById("signout").innerHTML = '<div onclick="signOut()">(登出)</div>';
-        }
-
+        }        
         function getlabel_list() {
             $.post({
                 url: ip + 'label_list',
@@ -179,20 +181,18 @@
                     var label_temp = null;
                     var count = 0;
                     labelHTML += "<tr>";
-
                     for (var i = 0; i < label_json.data.length;) {
                         if (count != 2) {
                             temp = i;
                             mid = "'" + label_json.data[i].id + "'";
                             label_temp = "'" + label_json.data[i].name + "'";
-                            var deleteImg = "<div class='box'><img  style='float:left;' src='./icon/deleteImg.png' class='deleteImg' onclick=\"delete_label(" + label_temp + "," + mid + ")\" ></div>";
+                            var deleteImg = "<div class='box'><img  style='float:left;' src='./icon/deleteImg.png' class='deleteImg img-fluid' onclick=\"delete_label(" + label_temp + "," + mid + ")\" alt='Responsive image'></div>";
                             var divName = "<div id='label_name' onclick=\"doFormRequest_toLabelImg('Labelimage.php','post'," + label_temp + "," + mid + ")\">" + label_json.data[i].name + "</div>";                            
                             if(label_json.data.length == 1){
-                                labelHTML += "<td width='4.6%' style='cursor:pointer;' class='label_click'>" + deleteImg + "</td>" + "<td width='45.4%' style='cursor:pointer;' class='label_click'>" + divName + "</td>";
+                                labelHTML += "<td width='4.6%' style='cursor:pointer;'>" + deleteImg + "</td>" + "<td width='45.4%'>" + divName + "</td>";
                             }
                             else{
-                                labelHTML += "<td width='7%' style='cursor:pointer;' class='label_click'>" + deleteImg + "</td>" + "<td width='43%' style='cursor:pointer;' class='label_click'>" + divName + "</td>";
-                            
+                                labelHTML += "<td width='7%' style='cursor:pointer;'>" + deleteImg + "</td>" + "<td width='43%'>" + divName + "</td>";                            
                             }                            
                             count++;
                             i++;
@@ -203,9 +203,7 @@
                             labelHTML += "</tr>";
                             if (i != label_json.data.length - 1) {
                                 labelHTML += "<tr>";
-
                             }
-
                         }
                     }
                     label_table.innerHTML = labelHTML;
@@ -216,17 +214,13 @@
         }
 
         function create_label() {
-
-            alertify.prompt("請輸入label名稱：", function (e, str) {
+            alertify.prompt("請輸入類別名稱：", function (e, str) {
                 if (e) {
-
                     labelname = str.trim();
                     if (labelname === '') {
-                        alertify.log("label名稱不得為空白!");
+                        alertify.log("類別名稱不得為空白!");
                     }
-
                     else if (labelname != null) {
-
                         $.post({
                             url: ip + 'create_label',
                             data: {
@@ -240,19 +234,16 @@
                                 msg = JSON.parse(msg);
                                 if (msg.message == "ok") {
                                     alertify.log('已新增label：' + str);
-
                                     getlabel_list();
                                 }
                                 else if (msg.message == 'invalid operate, duplicate name') {
                                     console.log(msg.message);
-                                    alertify.log("發生錯誤 : label名稱重複");
+                                    alertify.log("發生錯誤 : 類別名稱重複");
                                 }
                             },
                             error: function (xhr, ajaxOptions, thrownError) {
                             }
                         });
-
-
 
                     }
 
@@ -288,11 +279,8 @@
                         }
                     });
                 }
-
             })
-
         }
-
 
         function doFormRequest(url, action) {
             var login_json = { "key": key, "name": name, "id_token": id_token };
@@ -300,7 +288,6 @@
             console.log(url);
             form.action = url;
             form.method = action;
-
             // append input attribute and valus
             for (var keys in login_json) {
                 if (login_json.hasOwnProperty(keys)) {
@@ -309,31 +296,24 @@
                     input.type = "hidden";
                     input.name = keys;
                     input.value = val;
-
                     // append key-value to form
                     form.appendChild(input)
                 }
             }
-
             // send post request
             document.body.appendChild(form);
             form.submit();
-
             // remove form from document
             document.body.removeChild(form);
         }
-
-
 
         function doFormRequest_toLabelImg(url, action, label_name, id) {
             var form = document.createElement("form");
             console.log(url);
             form.action = url;
             form.method = action;
-
             // append input attribute and valus
             var label_json = { "key": key, "model_id": model_id, "model_name": model_name, "label_name": label_name, "label_id": id, "name": name, "id_token": id_token, "model_status": model_status };
-
             for (var keys in label_json) {
                 if (label_json.hasOwnProperty(keys)) {
                     var val = label_json[keys];
@@ -341,63 +321,28 @@
                     input.type = "hidden";
                     input.name = keys;
                     input.value = val;
-
                     // append key-value to form
                     form.appendChild(input)
                 }
             }
-
             // send post request
             document.body.appendChild(form);
             form.submit();
-
             // remove form from document
             document.body.removeChild(form);
         }
-
         function signOut() {
             var auth2 = gapi.auth2.getAuthInstance();
             auth2.signOut().then(function () {
                 window.location.href = 'index.php';
                 console.log('User signed out.');
             });
-        }
-
+        }        
         function Introduction(){
             alertify.alert("<?php echo $teach; ?>", function(){});
         }
     </script>
 
-    <link rel='stylesheet' id='all-css-0-1'
-        href='https://s2.wp.com/_static/??-eJyNU1ty2zAMvFAQNg+3X52chaQgCTYpcAjKrm9fUEoU13bY/GgAaBeLF80pgeep4FRMnCGFeaBJzCl5jiCRAp6vvEcv8mDu02R24jOlQqxezyHwqYUf+YgZ3OxcQGWXc8ANTpMPc6dhDZjOykiaQB4jTbeQvZii/w+O/2xGSzfQobKwJOsPsHhf6JIU4wIvKJdtPr9XeVnGHQHbKQCcze+z2/yVRGbisvSzGa1snjNqPCZbKiJiRxYDRoW1aDH9/GBVc9RemzJrqc6ljCKg30hzhDKq0C1vDZs0O5Nt5wP1PcLz1Q7/A7YiWNZBLzP+toruaFWCpeZmU9QNVQRn/csHQgj2ZArGFGy5ObpGAmFPNsC6tUunRR6QQTuz9UH840AfLOUWVQ8DLw4Jjs8tdEad4KDmsIzz022RCgtkTJwL9Jzjtf+9A49WCuZaYX3MmerT2WLNFL4OoqbYrK/2P76aIbCzoQLe4u+n3e7H7mn38vpr/xeIoMk8?cssminify=yes'
-        type='text/css' media='all' />
-    <style id='wpcom-admin-bar-inline-css' type='text/css'>
-        .admin-bar {
-            position: inherit !important;
-            top: auto !important;
-        }
-
-        .admin-bar .goog-te-banner-frame {
-            top: 32px !important
-        }
-
-        @media screen and (max-width: 782px) {
-            .admin-bar .goog-te-banner-frame {
-                top: 46px !important;
-            }
-        }
-
-        @media screen and (max-width: 480px) {
-            .admin-bar .goog-te-banner-frame {
-                position: absolute;
-            }
-        }
-    </style>
-    <style id='radcliffe-2-style-inline-css' type='text/css'>
-        .hero-area:before {
-            opacity: 0.4;
-        }
-    </style>
 </head>
 
 <body>
@@ -410,81 +355,70 @@
                 </div>
                 <div id='signout' style="display:inline-block; cursor:pointer;"></div>
             </div>
-            <div class="header-wrapper">
-                <div class="site-branding">
-                    <a href="index.php" class="custom-logo-link" rel="home" itemprop="url"><img width="399" height="300"
-                            src="./logo.png" class="custom-logo" alt="客製化影像辨識" itemprop="logo"
-                            sizes="(max-width: 740px) 100vw, 740px" data-attachment-id="61"
-                            data-permalink="https://123456.health.blog/cropped-imageedit_5_2410613130-2-png/"
-                            data-orig-file="https://123456health.files.wordpress.com/2019/02/cropped-imageedit_5_2410613130-2.png"
-                            data-orig-size="800,600" data-comments-opened="1"
-                            data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}"
-                            data-image-title="cropped-imageedit_5_2410613130-2.png" data-image-description="&lt;p&gt;https://123456health.files.wordpress.com/2019/02/cropped-imageedit_5_2410613130-2.png&lt;/p&gt;
-                                                                                           "
-                            data-medium-file="https://123456health.files.wordpress.com/2019/02/cropped-imageedit_5_2410613130-2.png?w=300"
-                            data-large-file="https://123456health.files.wordpress.com/2019/02/cropped-imageedit_5_2410613130-2.png?w=740" /></a>
-                    <div class="site-branding-text">
-                        <h1 class="site-title"><a href="" rel="home">客製化影像辨識</a></h1>
-                    </div><!-- .site-branding-text -->
-                </div><!-- .site-branding -->
-            </div><!-- .header-wrapper -->
-            <div class="menu-wrapper">
-                <nav id="site-navigation" class="main-navigation">
-                    <div>
-                        <ul id="header-menu" class="menu">
-                            <li id="menu-item-65"
-                                class="menu-item menu-item-type-custom menu-item-object-custom menu-item-65"><a
-                                    href="index.php">首頁</a></li>
-                            <li>
-                                <a style="cursor:pointer;" onclick="doFormRequest('modellist.php','post')">模型</a></li>
-                            <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-66">
-                                <a style="cursor:pointer;" onclick="create_label()">新增label</a>
-                            </li>
-                            <li id="synopsis" style="cursor:pointer;">
-                                <a onclick="Introduction()">操作說明</a>
-                            </li>
-                        </ul>
-                    </div>
-                </nav><!-- #site-navigation -->
-            </div><!-- .menu-wrapper -->
+            <div style="height:auto;" class="text-center">
+                <a href="index.php"  rel="home" itemprop="url">
+                    <img width="26%" height="auto" src="./logo1.png" class="rounded" alt="客製化影像辨識" itemprop="logo" />
+                </a>
+                <div class="site-branding-text">
+                    <h1 class="site-title"><a href="index.php" rel="home">CVision</a></h1>
+                </div><!-- .site-branding-text -->
+            </div><!-- .site-branding -->        
         </header><!-- #masthead -->
 
-        <h1 id='site-title' class="site-title" style="text-align:center;"></h1>
-        <div class="container" style="margin-top:5%; text-align:center;">
-            <table id="label_table" border="2" style="font-size:3vw;">
-
-            </table>
-
-        </div>
-        <div class="menu-wrapper">
-            <nav id="site-navigation" class="main-navigation" style="margin-left:46%; ">
-                <div id='container_actionButton'>
-                    <ul id="header-menu" class="menu">
-                        <li><a style="cursor:pointer;font-size: 140%;font-family:Microsoft JhengHei;"
-                                onclick="Train()">開始訓練</a></li>
-                    </ul>
-                    <ul id="header-menu" class="menu">
-                        <li id="identifyButton"><a
-                                style="cursor:pointer;font-size: 140%;font-family:Microsoft JhengHei;"
-                                onclick="Identify('predict.php','post')">開始辨識</a></li>
+        
+        <div class="container" style="margin-top:3%; text-align:center;">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown" style="font-weight:bold;">
+                    <ul class="navbar-nav">
+                        <li class="nav-item active">
+                            <a href="index.php" class="nav-link active">首頁</a>
+                        </li>
+                        <li class="nav-item">
+                            <a style="cursor:pointer;" onclick="doFormRequest('modellist.php','post')" class="nav-link">模型</a>
+                        </li>
+                        <li class="nav-item">
+                            <a style="cursor:pointer;" onclick="create_label()" class="nav-link">新增類別</a>
+                        </li>
+                        <li style="cursor:pointer;">
+                            <a onclick="Introduction()" class="nav-link">操作說明</a>
+                        </li>
+                        <li class="nav-item" id="share">
+                            <a style="cursor:pointer;" onclick="share_model()" class="nav-link" ></a>
+                        </li>
+                        <li class="nav-item">
+                            <a style="cursor:pointer;" onclick="doFormRequest('store.php','post')" class="nav-link">模型分享頁面</a>
+                        </li>                        
                     </ul>
                 </div>
-            </nav>
+            </nav><!-- #site-navigation -->
+            <h2 id='site-title' class="site-title" style="text-align:center;margin-top:3%"></h2>
+            <table id="label_table" border="2" style="font-size:3vw;margin-top:5%;" class="table table-striped">
+                
+            </table>
         </div>
+        <div class="container" style="margin-top:3%">
+            <div class="row">
+                <div class="col-sm-5"></div>
+                <label class="col-sm-2" style="font-size:140%;text-align :center;">                    
+                    <a onclick="Train()" class="font-family">開始訓練</a>
+                    <a id='identifyButton' style="margin-top:1%" onclick="Identify('predict.php','post')" class="font-family">開始辨識</a>
+                </label>
+                <div class="col-sm-5"></div>
+            </div>
+        </div>        
+    
         <footer id="colophon">
             <div class="row">
                 <div class="col-lg-1"></div>
-                <div class="col-lg-4" style="font-size:13px;margin: 1.5% 0 1.5% 0;font-family:微軟正黑體;">
-                    長榮大學資訊管理學系畢業專案發表<br>
-                    成員:尤家駿、余冠靖、張逸宗<br>
-                    指導老師:周信宏
+                <div class="col-lg-4" style="margin-top: 6%;">
+                    
                 </div>
                 <div class="col-lg-3"></div>
                 <div class="col-lg-4" style="font-size:13px;margin: 1.5% 0 0.5% 0">
-                    <a href="http://www.cjcu.edu.tw" class="logo">
-                        <img src="http://www.cjcu.edu.tw/images/logo-O1.png?v=1550022993" alt="長榮大學校徽-回首頁" width="15%">
-                        <img src="http://www.cjcu.edu.tw/images/cjcu.png?v=1550036037" alt="長榮大學書法題字" width="23%">
-                    </a>
+                    
                 </div>
             </div>
         </footer>
@@ -493,21 +427,43 @@
     <!--  -->
 
     <script>
-
         var model_name = "<?php echo $model_name;?>";
-        var model_status = "<?php echo $model_status; ?>";
-        console.log(model_status);
-        document.getElementById('site-title').innerHTML = '' + model_name;
-
-        if (model_status != "0") {
-            document.getElementById("identifyButton").style.display = "block";
-        }
-        else {
-            document.getElementById("identifyButton").style.display = "none";
-        }
-
-
-
+        var model_status = "<?php echo $model_status; ?>";      
+        var share_but = document.getElementById("share");        
+        document.getElementById('site-title').innerHTML = '' + model_name;        
+        function share_model(share) {
+            $.post({
+                url: ip + 'share_model',
+                data: {
+                    key: encodeURIComponent(key),
+                    model_id: encodeURIComponent(model_id),
+                    share: encodeURIComponent(share)
+                },
+                type: "POST",
+                success: function (msg) {
+                    msg = decodeURIComponent(msg);
+                    msg = JSON.parse(msg);
+                    if (msg.message == "ok") {
+                        if(share==1)
+                        {
+                            alertify.log("成功分享");
+                            share_but.innerHTML='<a style="cursor: pointer; display: block;" onclick="share_model(0)" class="nav-link" id="share">取消分享模型</a>';
+                        }
+                        else
+                        {
+                            alertify.log("成功取消分享");
+                            share_but.innerHTML='<a style="cursor: pointer; display: block;" onclick="share_model(1)" class="nav-link" id="share">公開分享模型</a>';
+                        }
+                        // get_model_info();
+                    } 
+                    else {
+                        alertify.log("有錯誤");
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                }
+            });
+        }         
         function Train() {
             $.post({
                 url: ip + 'train',
@@ -533,25 +489,41 @@
                     else if(msg.message == "invalid operate, include label which num of image less then 10."){
                         alertify.log("圖片數量至少要10張");
                     }
-
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
                 }
             });
-
         }
-
+        function get_model_info(){       
+            $.post({
+                url: ip + 'get_model_info',
+                data: {
+                    key: encodeURIComponent(key),
+                    model_id: encodeURIComponent(model_id)
+                },
+                type: "POST",             
+                success: function (msg) {
+                    msg = decodeURIComponent(msg);
+                    msg = JSON.parse(msg); 
+                    console.log(msg);
+                    share_status = msg.data[0].share;
+                    if(share_status == 0){
+                        share_but.innerHTML='<a style="cursor: pointer; display: block;" onclick="share_model(1)" class="nav-link" id="share">公開分享模型</a>';
+                    }
+                    else{
+                        share_but.innerHTML='<a style="cursor: pointer; display: block;" onclick="share_model(0)" class="nav-link" id="share">取消分享模型</a>';
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                }
+            });
+        }  
         function Identify(url, action) {
-
-
             var form = document.createElement("form");
             console.log(url);
             form.action = url;
             form.method = action;
-
-
             var label_json = { "key": key, "model_id": model_id, "name": name, "id_token": id_token };
-
             for (var keys in label_json) {
                 if (label_json.hasOwnProperty(keys)) {
                     var val = label_json[keys];
@@ -559,29 +531,27 @@
                     input.type = "hidden";
                     input.name = keys;
                     input.value = val;
-
                     // append key-value to form
                     form.appendChild(input)
                 }
             }
-
             // send post request
             document.body.appendChild(form);
             form.submit();
-
             // remove form from document
             document.body.removeChild(form);
-
-
-
         }
-
-
-
+        get_model_info();
+        if (model_status != "0") {
+            document.getElementById("identifyButton").style.display = "block";
+            share_but.style.display = "block";            
+        }
+        else {
+            document.getElementById("identifyButton").style.display = "none";
+            share_but.style.display = "block";
+            // share_but.style.width = "0";
+        }
     </script>
-
-
-
 
 
 </body>

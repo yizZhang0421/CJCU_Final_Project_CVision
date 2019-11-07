@@ -11,8 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +42,7 @@ public class ModelPageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         int layout_resource = ((Long) getArguments().get("layout")).intValue();
         final View view = inflater.inflate(layout_resource, container, false);
+        HashMap<String, String> model_info = ServerOperate.get_model_info(CurrentPosition.model_id);
         switch (layout_resource){
             case R.layout.model_page_labels:
                 model_page_labels_view=view;
@@ -89,18 +93,40 @@ public class ModelPageFragment extends Fragment {
                     }
                 });
                 break;
-            case R.layout.model_page_evaluate:break;
+            case R.layout.model_page_evaluate:
+                if(model_info.get("acc").equals("null")){
+                    view.findViewById(R.id.model_evaluate_wraper).setVisibility(View.INVISIBLE);
+                }
+                break;
             case R.layout.model_page_train:
                 Button button = view.findViewById(R.id.start_train_button);
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        ServerOperate.train(CurrentPosition.key, CurrentPosition.model_id);
+                        MessageServerResponse messageServerResponse = ServerOperate.train(CurrentPosition.key, CurrentPosition.model_id);
+                        Toast.makeText(ModelPage.modelpage, messageServerResponse.message, Toast.LENGTH_SHORT).show();
                         ModelPage.modelpage.finish();
                     }
                 });
                 break;
-            case R.layout.model_page_config:break;
+            case R.layout.model_page_config:
+                Switch share = view.findViewById(R.id.share_switch);
+                String initial_share = model_info.get("share");
+                if(initial_share.equals("0")){
+                    share.setChecked(false);
+                }
+                else{
+                    share.setChecked(true);
+                }
+                share.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        ServerOperate.share_model(CurrentPosition.key, CurrentPosition.model_id, isChecked);
+                    }
+                });
+
+
+                break;
         }
         return view;
     }

@@ -2,16 +2,16 @@
 *
 
 #folder
-!v2/
-!v2/**
-!v3/
-!v3/**
-!developer_experiment/
-!developer_experiment/**
+!labels/
+!labels/**
+!models/
+!models/**
+!hyper_space/
+!hyper_space/**
+!predict_queue/
+!predict_queue/**
 
 # And all the file types you're interested in.
 !.gitignore
-!*.txt
-!*.sql
-!*.json
 !*.py
+!*.sql

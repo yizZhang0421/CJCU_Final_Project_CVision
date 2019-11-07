@@ -20,7 +20,8 @@
         android:text="開始訓練就不可以執行增加圖片、類別等操作
 該模型會消失在模型列表中
 可以在首頁的進度列表中看到訓練的進度
-可以中斷或等到完成訓練即可復原"
+可以中斷或等到完成訓練即可復原\n\n\n
+! 注意：訓練完成會重置模型辨識效果"
         android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

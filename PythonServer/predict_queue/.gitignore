@@ -1,0 +1,8 @@
+#ignore all
+*
+
+#folder
+
+# And all the file types you're interested in.
+!.gitignore
+

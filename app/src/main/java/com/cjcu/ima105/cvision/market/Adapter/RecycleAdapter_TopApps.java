@@ -2,9 +2,13 @@ package com.cjcu.ima105.cvision.market.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +18,7 @@ import android.widget.TextView;
 import com.cjcu.ima105.cvision.Market;
 import com.cjcu.ima105.cvision.MarketItemDescription;
 import com.cjcu.ima105.cvision.R;
+import com.cjcu.ima105.cvision.SignOut;
 import com.github.siyamed.shapeimageview.mask.PorterShapeImageView;
 
 import java.util.List;
@@ -35,7 +40,7 @@ public class RecycleAdapter_TopApps extends RecyclerView.Adapter<RecycleAdapter_
 
 
         PorterShapeImageView image;
-        TextView number, title, view1, install, description;
+        TextView number, title, view1, install, description, id;
         LinearLayout wraper;
 
 
@@ -82,7 +87,9 @@ public class RecycleAdapter_TopApps extends RecyclerView.Adapter<RecycleAdapter_
         holder.view1.setText(movie.getView());
         holder.install.setText(movie.getInstall());
         holder.number.setText(movie.getNumber());
-        holder.image.setImageResource(movie.getImage());
+        byte[] decodedString = Base64.decode(movie.getImage(), Base64.DEFAULT);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        holder.image.setImageBitmap(bitmap);
 
         holder.wraper.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,6 +100,8 @@ public class RecycleAdapter_TopApps extends RecyclerView.Adapter<RecycleAdapter_
                 intent.putExtra("view1", movie.getView());
                 intent.putExtra("install", movie.getInstall());
                 intent.putExtra("description", movie.getDescription());
+                intent.putExtra("id", movie.getId());
+                intent.putExtra("market", movie.getMarket());
                 Market.market_contect.startActivity(intent);
             }
         });

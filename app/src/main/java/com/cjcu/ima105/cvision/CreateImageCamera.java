@@ -7,13 +7,16 @@ import android.os.Bundle;
 import android.support.constraint.solver.widgets.Rectangle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
+import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.camerakit.CameraKitView;
@@ -29,11 +32,12 @@ import java.util.HashMap;
 
 public class CreateImageCamera extends AppCompatActivity {
     public CameraKitView cameraKitView;
-    private ImageView capture_button;
-    private ImageView crop_mode_button;
     private FrameLayout pnlFlash;
-    private View.OnTouchListener onTouchListener;
     private CropWindowView cropWindowView;
+    private LinearLayout control_area;
+    private ImageView capture_button;
+    private View.OnClickListener onTouchListener;
+    private ImageView crop_mode_button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,23 +45,18 @@ public class CreateImageCamera extends AppCompatActivity {
         setContentView(R.layout.create_image_camera);
 
         cameraKitView = findViewById(R.id.camera);
+        control_area=findViewById(R.id.control_area);
         capture_button=findViewById(R.id.capture_button);
         crop_mode_button=findViewById(R.id.crop_mode_button);
         cropWindowView = findViewById(R.id.crop_window);
         pnlFlash = findViewById(R.id.pnlFlash);
 
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int screen_width = size.x;
-        cameraKitView.setLayoutParams(new RelativeLayout.LayoutParams(screen_width, (int)((4*1.f)*((screen_width*1.f)/(3*1.f)))));
-        cropWindowView.setLayoutParams(new RelativeLayout.LayoutParams(screen_width, (int)((4*1.f)*((screen_width*1.f)/(3*1.f)))));
-
-        onTouchListener = new View.OnTouchListener() {
+        onTouchListener = new View.OnClickListener() {
             @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
+            public void onClick(View view) {
+                Log.e("asd", "click");
                 final View the_touch_view = view;
-                the_touch_view.setOnTouchListener(null);
+                the_touch_view.setOnClickListener(null);
                 cameraKitView.captureImage(new  CameraKitView.ImageCallback() {
                     @Override
                     public void onImage(final CameraKitView cameraKitView, final byte[] capturedImage) {
@@ -89,11 +88,17 @@ public class CreateImageCamera extends AppCompatActivity {
                                     String imageStr = Base64.encodeToString(capturedImage, Base64.DEFAULT);
                                     if(cropWindowView.getVisibility()==View.VISIBLE) {
                                         Bitmap bitmap = BitmapFactory.decodeByteArray(capturedImage, 0, capturedImage.length);
-                                        BigDecimal bitmap_width = new BigDecimal(bitmap.getWidth() + "");
-                                        BigDecimal camera_view_width = new BigDecimal(cameraKitView.getWidth() + "");
-                                        BigDecimal scale = bitmap_width.divide(camera_view_width, 10, RoundingMode.HALF_UP);
-                                        Rectangle rectangle = cropWindowView.getCropLocationWithScaleToBitmapLocation(scale);
-                                        bitmap = Bitmap.createBitmap(bitmap, rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+                                        bitmap=cropBitmapCenter(bitmap, cameraKitView.getWidth(), cameraKitView.getHeight(), control_area.getHeight());
+                                        Rectangle rectangle = cropWindowView.getCropLocationWithScaleToBitmapLocation(BigDecimal.ONE);
+                                        float x = (float)rectangle.x/(float)cropWindowView.getWidth();
+                                        float y = (float)rectangle.y/(float)cropWindowView.getHeight();
+                                        float width = (float)rectangle.width/(float)cropWindowView.getWidth();
+                                        float height = (float)rectangle.height/(float)cropWindowView.getHeight();
+                                        bitmap = Bitmap.createBitmap(bitmap,
+                                                Math.round((float)bitmap.getWidth()*x),
+                                                Math.round((float)bitmap.getHeight()*y),
+                                                Math.round((float)bitmap.getWidth()*width),
+                                                Math.round((float)bitmap.getHeight()*height));
                                         ByteArrayOutputStream crop_captureImage_byte = new ByteArrayOutputStream();
                                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, crop_captureImage_byte);
                                         imageStr = Base64.encodeToString(crop_captureImage_byte.toByteArray(), Base64.DEFAULT);
@@ -101,7 +106,7 @@ public class CreateImageCamera extends AppCompatActivity {
 
                                     MessageServerResponse write_image_response = ServerOperate.write_image(CurrentPosition.key, CurrentPosition.label_id, imageStr);
 
-                                    the_touch_view.setOnTouchListener(onTouchListener);
+                                    the_touch_view.setOnClickListener(onTouchListener);
                                 }catch (Exception e){
                                     e.printStackTrace();
                                 }
@@ -110,10 +115,9 @@ public class CreateImageCamera extends AppCompatActivity {
                         t.start();
                     }
                 });
-                return true;
             }
         };
-        capture_button.setOnTouchListener(onTouchListener);
+        capture_button.setOnClickListener(onTouchListener);
         crop_mode_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -126,15 +130,42 @@ public class CreateImageCamera extends AppCompatActivity {
             }
         });
     }
-    private String map2json_dictionary(HashMap<String,String> map){
-        String result="{";
-        for(String key : map.keySet()){
-            result+="\""+key+"\":\""+map.get(key)+"\",";
+    private Bitmap cropBitmapCenter(Bitmap bitmap, int viewWidth, int viewHeight, int buttonViewHeight){
+        Bitmap croppedBitmap = null;
+
+        int bitmapWidth     = bitmap.getWidth();
+        int bitmapHeight    = bitmap.getHeight();
+        if(bitmapWidth>viewWidth && bitmapHeight>viewHeight){
+            int newX = Math.round((float) bitmapWidth / (float) 2) - Math.round((float) viewWidth / (float) 2);
+            int newY = Math.round((float) bitmapHeight / (float) 2) - Math.round((float) viewHeight / (float) 2);
+            croppedBitmap = Bitmap.createBitmap(bitmap, newX, newY, viewWidth, viewHeight-buttonViewHeight);
         }
-        result=result.substring(0,result.length()-1);
-        result+="}";
-        return result;
+        else {
+            BigDecimal scale = new BigDecimal(bitmapWidth).divide(new BigDecimal(viewWidth), 10, RoundingMode.HALF_UP);
+            int suitViewWidth = new BigDecimal(viewWidth).multiply(scale).intValue();
+            int suitViewHeight = new BigDecimal(viewHeight).multiply(scale).intValue();
+            int suitButtonViewHeight = new BigDecimal(buttonViewHeight).multiply(scale).intValue();
+            if (suitViewHeight > bitmapHeight) {
+                scale = new BigDecimal(bitmapHeight).divide(new BigDecimal(viewHeight), 10, RoundingMode.HALF_UP);
+                suitViewWidth = new BigDecimal(viewWidth).multiply(scale).intValue();
+                suitViewHeight = new BigDecimal(viewHeight).multiply(scale).intValue();
+                suitButtonViewHeight = new BigDecimal(buttonViewHeight).multiply(scale).intValue();
+                int newX = Math.round((float) bitmapWidth / (float) 2) - Math.round((float) suitViewWidth / (float) 2);
+                croppedBitmap = Bitmap.createBitmap(bitmap, newX, 0, suitViewWidth, suitViewHeight - suitButtonViewHeight);
+            } else {
+                int newY = Math.round((float) bitmapHeight / (float) 2) - Math.round((float) suitViewHeight / (float) 2);
+                croppedBitmap = Bitmap.createBitmap(bitmap, 0, newY, suitViewWidth, suitViewHeight - suitButtonViewHeight);
+            }
+        }
+        return croppedBitmap;
     }
+
+
+
+
+
+
+
 
     @Override
     protected void onStart() {

@@ -12,7 +12,9 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,10 +25,13 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
+import android.widget.Toast;
 
 import com.github.ybq.android.spinkit.SpinKitView;
 import com.github.ybq.android.spinkit.sprite.Sprite;
@@ -233,10 +238,34 @@ public class LabelPage extends AppCompatActivity {
 
     }
 
+    Switch switchCompat;
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.label_page_menu, menu);
+        switchCompat= (Switch) menu.findItem(R.id.menu_label_share).getActionView();
+        HashMap<String, String> label_info = ServerOperate.get_label_info(CurrentPosition.label_id);
+        if(label_info.get("share").equals("1")){
+            switchCompat.setChecked(true);
+        }
+        else{
+            switchCompat.setChecked(false);
+        }
+        switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                MessageServerResponse response = ServerOperate.share_label(CurrentPosition.key, CurrentPosition.label_id, isChecked);
+                if(response.message.equals("ok") && isChecked){
+                    Toast.makeText(LabelPage.this, "shared", Toast.LENGTH_SHORT).show();
+                }
+                else if(response.message.equals("ok") && !isChecked){
+                    Toast.makeText(LabelPage.this, "cancel shared", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(LabelPage.this, response.message, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         return true;
     }
     @Override

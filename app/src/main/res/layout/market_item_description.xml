@@ -7,6 +7,11 @@
     android:layout_height="match_parent"
     tools:context=".MarketItemDescription"
     android:orientation="vertical">
+    <TextView
+        android:id="@+id/model_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -110,7 +115,7 @@
                     android:layout_height="wrap_content"
                     android:numStars="5"
                     android:stepSize="1.0"
-                    android:rating="4"
+                    android:rating="0"
                     android:isIndicator="false"
                     style="?android:attr/ratingBarStyleSmall"
                     android:theme="@style/RatingBar"
@@ -149,12 +154,27 @@
         </LinearLayout>
 
         <com.cjcu.ima105.cvision.market.customfonts.Button_Roboto_Medium
+            android:id="@+id/import_model"
             android:background="@color/colorPrimary"
             android:text="匯入"
             android:textColor="@color/bg_color"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"/>
+
+        <com.cjcu.ima105.cvision.market.customfonts.MyTextView_Roboto_Black
+            android:text="範例："
+            android:layout_marginTop="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/sample_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:clipToPadding="false"
+            android:paddingTop="15dp" />
+
         <com.cjcu.ima105.cvision.market.customfonts.MyTextView_Roboto_Black
             android:text="介紹："
             android:layout_marginTop="30dp"

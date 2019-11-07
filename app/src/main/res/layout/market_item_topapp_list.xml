@@ -61,7 +61,7 @@
                         android:layout_height="wrap_content"
                         android:numStars="5"
                         android:stepSize="1.0"
-                        android:rating="4"
+                        android:rating="0"
                         android:isIndicator="false"
                         style="?android:attr/ratingBarStyleSmall"
                         android:theme="@style/RatingBar"

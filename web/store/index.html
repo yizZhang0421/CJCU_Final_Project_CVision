@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html style="height: 100%;">
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.10/alertify.core.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.10/alertify.default.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.10/alertify.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+        <style>
+            .deDefaultBSmargin{
+                margin-left: 0;margin-right: 0;
+            }
+            .sideMenu{
+                height: 40px;
+                padding: 0 24px;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+            .sideMenu:hover{
+                background-color:#F2F2F2;
+                cursor: pointer;
+            }
+            .item{
+                margin: 4px 2px;
+            }
+            .itemIconFade:hover{
+                opacity: 0.6;
+                cursor: pointer;
+            }
+            .itemIconFade{
+                background-color: #999999;
+                opacity: 0;
+                transition: opacity .25s ease-in-out;
+            }
+            .main {
+                opacity: 1;
+                display: block;
+                width: 100%;
+                height: auto;
+                transition: .5s ease;
+                backface-visibility: hidden;
+            }
+            .container:hover .main {
+                opacity: 0.3;
+                cursor:pointer;
+            }
+            .all .pic{
+                float:left;margin-right:10px;width:100px;height:100px;
+            }
+            .all .text{
+                float:left;width:500px;
+            }
+        </style>
+        <script>
+            window.onload = function () {
+                
+            }            
+            function model_Introduction(){
+                var html="<img src='C:\\python\\MachineLearning\\cats_dogs_small\\train\\dogs\\dog.880.jpg' width='25%'>"
+                        +"<div>cjcu校狗<br>z58774556@gmail.com<br>介紹:長榮大學校狗資料集<br>有虎皮、朱利安、老米三類影像，每類有2000張</div>";                                                                        
+                alertify.set({ labels: {
+                    ok     : "匯入",
+                    cancel : "關閉"
+                }});       
+                alertify.confirm(html,
+                    function(){
+                        alertify.success('123456');
+                    },
+                    function(){
+                        alertify.error('1234565');
+                });                                            
+            }
+        </script>
+    </head>
+    <body style="background-color: #F9F9F9;display: flex;flex-flow: column;height: 100%;">
+        <div class="row deDefaultBSmargin" style="padding: 10px 0;background-color: #FFFFFF;">
+            <div class="col-lg-2" style="margin-top: 10px;height: 60px;background-image: url('image/logo.jpg');background-repeat: no-repeat; background-size: contain;background-position: center center"></div>
+            <div class="col-lg-6" style="height: 60px;">
+                <div class="input-group mb-3" style="position: relative;top: 50%;transform: translateY(-50%);">
+                    <input type="text" class="form-control" placeholder="搜尋模型、資料集">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary fa fa-search" type="button"></button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4" style="height: 60px;text-align: center;position: relative;top: 50%;transform: translateY(-50%);">
+                109-04 Cjcu-im-prj 你好！ (登出)
+                
+            </div>
+        </div>
+        <div id="content" class="row deDefaultBSmargin" style="flex: 1 0 auto;">
+            <div id="sideMenu" class="col-lg-2 deDefaultBSmargin" style="background-color: #FFFFFF;padding: 0;">
+                <div class="sideMenu">
+                    <div style="margin-right: 24px;height: 24px;width: 24px;background-image: url('image/model.png');background-repeat: no-repeat; background-size: contain;background-position: center center"></div>
+                    <div style="font-size: 14px;margin-right: 24px;color: #0D0D0D;font-family: Roboto,Noto,sans-serif;">模型</div>
+                </div>
+                <div class="sideMenu">
+                    <div style="margin-right: 24px;height: 24px;width: 24px;background-image: url('image/dataset.png');background-repeat: no-repeat; background-size: contain;background-position: center center"></div>
+                    <div style="font-size: 14px;margin-right: 24px;color: #0D0D0D;font-family: Roboto,Noto,sans-serif;">資料集</div>
+                </div>
+            </div>
+
+            <div id="itemContainer" class="col-lg-10" style="background-color: #F9F9F9;padding: 40px 20px 10px 20px;overflow-y: scroll;">
+                <script>
+                    $("#itemContainer").css({'height': ($("#content").height() + 'px')}); //fixed height
+                </script>
+                <!--#################################-->
+                <div class="item" style="display: inline-block;">
+                    <div style="position: relative;height: 160px;width: 160px;" class="container">
+                        <div class="main" onclick="model_Introduction()">
+                            <img src="C:\\python\\MachineLearning\\cats_dogs_small\\train\\dogs\\dog.880.jpg" height="100%"  width="100%">                                                    
+                            <div style="white-space:nowrap;overflow:hidden;">
+                                <a href="#" style="font-size: 16px;color: #333333;font-family: Roboto,Noto,sans-serif;">CJCU校狗</a>
+                            </div>
+                            <div style="font-size: 13px;color: #333333;font-family: Roboto,Noto,sans-serif;">z58774556@gmail.com</div>
+                        </div>                                             
+                    </div>                                                                
+                </div>
+                <!--#################################-->
+
+            </div>
+        </div>
+    </body>
+</html>

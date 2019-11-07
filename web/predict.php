@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">    
     <meta name="google-signin-scope" content="profile email">
     <meta name="google-signin-client_id"
         content="488772557570-m50f06mgi4lqnkki7jevo3cjkgtqercc.apps.googleusercontent.com">
@@ -19,99 +19,77 @@
     <link href="//cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.10/alertify.core.css" rel="stylesheet">
     <link href="//cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.10/alertify.default.css" rel="stylesheet">
     <script src="//cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.10/alertify.min.js"></script>
-    <title>客製化影像辨識</title>
+    <title>CVision</title>
 
     <?php 
         include('global_config.php');
         $key = $_POST['key'];
         $model_id = $_POST['model_id'] ;
         $name = $_POST['name'] ;
-        $id_token = $_POST['id_token'];
-        
+        $id_token = $_POST['id_token'];        
         ?>
 
     <style>
+        .alertify{
+            top : 0;
+            font-size:2.6vh;
+        }
         #upload_input {
             display: none;
         }
-
-
-
         #colophon {
             background-color: #555555;
             color: #ffffff;
-            margin-top: 5%;
+            margin-top: 5%;           
             font-family: Microsoft JhengHei;
         }
-
         #masthead {
             background: linear-gradient(180deg, #BBBBBB 0%, #EEEEEE 100%);
             background: -moz-linear-gradient(180deg, #BBBBBB 0%, #EEEEEE 100%);
             background: -webkit-linear-gradient(270deg, #BBBBBB 0%, #ffffff 100%);
             background: -o-linear-gradient(180deg, #BBBBBB 0%, #EEEEEE 100%);
         }
-
         #Text2::before {
             content: " | ";
             color: #f2f2f2;
         }
-
         #Text3::before {
             content: " | ";
             color: #f2f2f2;
         }
-
         .copyright {
             float: right;
             font-size: 13px;
             font-family: 'proxima-nova', sans-serif;
             color: #f2f2f2;
-
         }
-
         #uploadImg {
             width: 5vw;
             opacity: 1;
-
         }
-
         #uploadImg:hover {
-
             transition-property: opacity;
             transition-duration: 0.3s;
-
             opacity: 0.5;
-
         }
     </style>
-
 
     <script type="text/javascript">
         var ip = "<?php echo $base_url; ?>";
         var name = "<?php echo $name; ?>";
         var key = "<?php echo $key; ?>";
         var id_token = "<?php echo $id_token; ?>";
-
-
-
         window.onload = function () {
             var temp = document.getElementsByClassName('abcRioButton');
-
-
             temp[0].style.setProperty('background-color', '#d9d9d9');
             temp[0].style.setProperty('width', '95%');
         }
-
-
-
-
         function doFormRequest(url, action) {
             var login_json = { "key": key, "name": name, "id_token": id_token };
             var form = document.createElement("form");
             console.log(url);
             form.action = url;
             form.method = action;
-
             // append input attribute and valus
             for (var keys in login_json) {
                 if (login_json.hasOwnProperty(keys)) {
@@ -120,28 +98,17 @@
                     input.type = "hidden";
                     input.name = keys;
                     input.value = val;
-
                     // append key-value to form
                     form.appendChild(input)
                 }
             }
-
             // send post request
             document.body.appendChild(form);
             form.submit();
-
             // remove form from document
             document.body.removeChild(form);
         }
-
-
-
-
-        /* <![CDATA[ */
-
-
         var model_id = "<?php echo $model_id; ?>";
-
         function addLoadEvent(func) {
             var oldonload = window.onload;
             if (typeof window.onload != 'function') {
@@ -153,12 +120,10 @@
                 }
             }
         }
-
         window.onload = function () {
             document.getElementById('Signin').innerHTML = name + ' 你好！';
             document.getElementById("signout").innerHTML = '<div onclick="signOut()">(登出)</div>';
         }
-
         function signOut() {
             var auth2 = gapi.auth2.getAuthInstance();
             auth2.signOut().then(function () {
@@ -170,10 +135,6 @@
             alertify.alert("<?php echo $teach; ?>", function(){});
         }
     </script>
-
-    <link rel='stylesheet' id='all-css-0-1'
-        href='https://s2.wp.com/_static/??-eJyNU1ty2zAMvFAQNg+3X52chaQgCTYpcAjKrm9fUEoU13bY/GgAaBeLF80pgeep4FRMnCGFeaBJzCl5jiCRAp6vvEcv8mDu02R24jOlQqxezyHwqYUf+YgZ3OxcQGWXc8ANTpMPc6dhDZjOykiaQB4jTbeQvZii/w+O/2xGSzfQobKwJOsPsHhf6JIU4wIvKJdtPr9XeVnGHQHbKQCcze+z2/yVRGbisvSzGa1snjNqPCZbKiJiRxYDRoW1aDH9/GBVc9RemzJrqc6ljCKg30hzhDKq0C1vDZs0O5Nt5wP1PcLz1Q7/A7YiWNZBLzP+toruaFWCpeZmU9QNVQRn/csHQgj2ZArGFGy5ObpGAmFPNsC6tUunRR6QQTuz9UH840AfLOUWVQ8DLw4Jjs8tdEad4KDmsIzz022RCgtkTJwL9Jzjtf+9A49WCuZaYX3MmerT2WLNFL4OoqbYrK/2P76aIbCzoQLe4u+n3e7H7mn38vpr/xeIoMk8?cssminify=yes'
-        type='text/css' media='all' />
     <style id='wpcom-admin-bar-inline-css' type='text/css'>
         .admin-bar {
             position: inherit !important;
@@ -200,11 +161,7 @@
             position: relative;
             width: 100%;
             margin: 0;
-
         }
-
-
-
         #identifyButton {
             cursor: pointer;
             font-size: 1.6vw;
@@ -217,15 +174,10 @@
             transition: 0.8s;
             position: relative;
             overflow: hidden;
-
         }
-
         #identifyButton:hover {
-
             color: #fff;
-
         }
-
         #identifyButton::before {
             top: 0;
             border-radius: 50% 50% 50% 50%;
@@ -237,26 +189,20 @@
             background: #fff;
             z-index: -1;
             transition: 0.6s;
-
         }
-
         #identifyButton:hover::before {
             background: #ff1a1a;
-
         }
-
         #box {
             position: relative;
             overflow: hidden;
             margin: 20px;
         }
-
         #box:after {
             padding-top: 42.8%;
             content: "";
             display: block;
         }
-
         #blah {
             position: absolute;
             top: 0;
@@ -266,17 +212,9 @@
             max-height: 100%;
             margin: auto;
         }
-
         #Signin,
         #signout {
-
             font-size: 1vw;
-
-        }
-    </style>
-    <style id='radcliffe-2-style-inline-css' type='text/css'>
-        .hero-area:before {
-            opacity: 0.4;
         }
     </style>
 </head>
@@ -291,32 +229,40 @@
                 </div>
                 <div id='signout' style="display:inline-block; cursor:pointer;"></div>
             </div>
-            <div class="header-wrapper">
-                <div class="site-branding">
-                    <a href="index.php" class="custom-logo-link" rel="home" itemprop="url"><img width="445" height="407"
-                            src="./logo.png" class="custom-logo" alt="客製化影像辨識" itemprop="logo" /></a>
-                    <div class="site-branding-text">
-                        <h1 class="site-title"><a href="" rel="home">客製化影像辨識</a></h1>
-                    </div><!-- .site-branding-text -->
-                </div><!-- .site-branding -->
-            </div><!-- .header-wrapper -->
-            <div class="menu-wrapper">
-                <nav id="site-navigation" class="main-navigation">
-                    <div>
-                        <ul id="header-menu" class="menu">
-                            <li id="menu-item-65"
-                                class="menu-item menu-item-type-custom menu-item-object-custom menu-item-65"><a
-                                    href="index.php">首頁</a></li>
-                            <li><a style="cursor:pointer;" onclick="doFormRequest('modellist.php','post')">模型</a></li>
-                            <li id="synopsis" style="cursor:pointer;">
-                                <a onclick="Introduction()">操作說明</a>
-                            </li>
-                        </ul>
-                    </div>
-                </nav><!-- #site-navigation -->
-            </div><!-- .menu-wrapper -->
+            <div style="height:auto;" class="text-center">
+                <a href="index.php"  rel="home" itemprop="url">
+                    <img width="26%" height="auto" src="./logo1.png" class="rounded" alt="客製化影像辨識" itemprop="logo" />
+                </a>
+                <div class="site-branding-text">
+                    <h1 class="site-title"><a href="index.php" rel="home">CVision</a></h1>
+                </div><!-- .site-branding-text -->
+            </div><!-- .site-branding -->  
         </header><!-- #masthead -->
-        <h1 id='site-title' class="site-title" style="text-align:center;">上傳圖片進行辨識</h1>
+        <div class="container" style="margin-top:3%;">
+            <nav id="site-navigation" class="navbar navbar-expand-lg navbar-light">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown" style="font-weight:bold;"> 
+                    <ul class="navbar-nav">
+                        <li class="nav-item active">
+                            <a href="index.php" class="nav-link active">首頁</a>
+                        </li>
+                        <li id="model_but" class="nav-item">
+                            <a style="cursor:pointer;" onclick="doFormRequest('modellist.php','post')" class="nav-link">模型</a>
+                        </li>                        
+                        <li id="synopsis" style="cursor:pointer;" class="nav-item">
+                            <a onclick="Introduction()" class="nav-link">操作說明</a>
+                        </li>
+                        <li id="store_but" style="cursor:pointer;" class="nav-item">
+                            <a class="nav-link" onclick="doFormRequest('store.php','post')">模型分享頁面</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav><!-- #site-navigation -->
+            <h2 style="text-align:center;margin-top:3%;">上傳圖片進行辨識</h2>
+        </div>
+        
         <div class="row">
             <div class="col-sm-2"></div>
             <div class="col-sm-8" id="box">
@@ -335,26 +281,22 @@
                         <img id='uploadImg' src="./icon/upload.png" style="margin:0 auto;">
                     </div>
                 </label>
-                <div class="col-sm-4"></div>
+            <div class="col-sm-4"></div>
             </div>
         </div>
-        <div style="text-align :center; margin-top:2.5vh"><a id='identifyButton' class='AA' onclick="predict()">開始辨識</a>
+        <div style="text-align :center; margin-top:2.5vh">
+            <a id='identifyButton' onclick="predict()">開始辨識</a>
         </div>
 
         <footer id="colophon">
             <div class="row">
                 <div class="col-lg-1"></div>
-                <div class="col-lg-4" style="font-size:13px;margin: 1.5% 0 1.5% 0;font-family:微軟正黑體;">
-                    長榮大學資訊管理學系畢業專案發表<br>
-                    成員:尤家駿、余冠靖、張逸宗<br>
-                    指導老師:周信宏
+                <div class="col-lg-4" style="margin-top: 6%;">
+                    
                 </div>
                 <div class="col-lg-3"></div>
                 <div class="col-lg-4" style="font-size:13px;margin: 1.5% 0 0.5% 0">
-                    <a href="http://www.cjcu.edu.tw" class="logo">
-                        <img src="http://www.cjcu.edu.tw/images/logo-O1.png?v=1550022993" alt="長榮大學校徽-回首頁" width="15%">
-                        <img src="http://www.cjcu.edu.tw/images/cjcu.png?v=1550036037" alt="長榮大學書法題字" width="23%">
-                    </a>
+                    
                 </div>
             </div>
         </footer>

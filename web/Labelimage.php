@@ -13,20 +13,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.11.2/build/alertify.min.js"></script>
-
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.2/build/css/alertify.min.css" />
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.2/build/css/themes/default.min.css" />
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.2/build/css/themes/semantic.min.css" />
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.2/build/css/themes/bootstrap.min.css" />
-
-    <title>客製化影像辨識</title>
-
-
-    <link rel='stylesheet' id='all-css-0-1'
-        href='https://s2.wp.com/_static/??-eJyNU1ty2zAMvFAQNg+3X52chaQgCTYpcAjKrm9fUEoU13bY/GgAaBeLF80pgeep4FRMnCGFeaBJzCl5jiCRAp6vvEcv8mDu02R24jOlQqxezyHwqYUf+YgZ3OxcQGWXc8ANTpMPc6dhDZjOykiaQB4jTbeQvZii/w+O/2xGSzfQobKwJOsPsHhf6JIU4wIvKJdtPr9XeVnGHQHbKQCcze+z2/yVRGbisvSzGa1snjNqPCZbKiJiRxYDRoW1aDH9/GBVc9RemzJrqc6ljCKg30hzhDKq0C1vDZs0O5Nt5wP1PcLz1Q7/A7YiWNZBLzP+toruaFWCpeZmU9QNVQRn/csHQgj2ZArGFGy5ObpGAmFPNsC6tUunRR6QQTuz9UH840AfLOUWVQ8DLw4Jjs8tdEad4KDmsIzz022RCgtkTJwL9Jzjtf+9A49WCuZaYX3MmerT2WLNFL4OoqbYrK/2P76aIbCzoQLe4u+n3e7H7mn38vpr/xeIoMk8?cssminify=yes'
-        type='text/css' media='all' />
-
+    <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.12.0/build/alertify.min.js"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.12.0/build/css/alertify.min.css"/>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.12.0/build/css/themes/default.min.css"/>    
+    <title>CVision</title>
 
     <?php
     include('global_config.php');
@@ -38,7 +28,6 @@
     $id_token = $_POST['id_token'];
     $model_name = $_POST['model_name'] ;
     $model_status = $_POST['model_status'];
-    
     ?>
 
 
@@ -54,13 +43,14 @@
         var img_json = null;
         window.onload = function () {
             getimage_path();
+            getlabel_info();
             document.getElementById('Signin').innerHTML = name + ' 你好！';
             document.getElementById("signout").innerHTML = '<div onclick="signOut()">(登出)</div>';
+            
         };
         function doFormRequest(url, action) {
             var login_json = { "key": key, "name": name, "id_token": id_token };
             var form = document.createElement("form");
-
             form.action = url;
             form.method = action;
             // append input attribute and valus
@@ -71,16 +61,13 @@
                     input.type = "hidden";
                     input.name = keys;
                     input.value = val;
-
                     // append key-value to form
                     form.appendChild(input)
                 }
             }
-
             // send post request
             document.body.appendChild(form);
             form.submit();
-
             // remove form from document
             document.body.removeChild(form);
         }
@@ -97,7 +84,6 @@
                 success: function (msg) {
                     msg = decodeURIComponent(msg);
                     img_json = JSON.parse(msg);
-
                     var table = document.getElementById("imgTable");
                     var table_html = "";
                     for (var i = 0; i < img_json.data.length; i++) {
@@ -106,7 +92,6 @@
                             + "&image_id=" + img_json.data[i];
                         table_html += '<div class="Box"><img src="' + img_path + '"class="img-responsive"><input class="imgCheck" type="checkbox" name="1"></div>'
                     }
-
                     table.innerHTML = table_html;
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
@@ -122,11 +107,8 @@
         }
 
         function deleteAction() {
-
             var array1 = [];
-
             var container = document.getElementsByClassName("imgCheck");
-
             for (var i = 0; i < container.length; i++) {
                 if (container[i].checked == true) {
                     var temp = container[i].parentNode.childNodes;
@@ -139,20 +121,13 @@
                         }
                     }
                 }
-
             }
-
-
-
             for (var k = 0; k < array1.length; k++) {
-
                 var image = array1[k];
-
                 $.post({
                     url: ip + 'delete_image',
                     data: {
                         key: encodeURIComponent(key),
-
                         label_id: encodeURIComponent(label_id),
                         image_id: encodeURIComponent(image),
                     },
@@ -172,26 +147,17 @@
 
             }
             // getimage_path();
-            console.log(array1.length);
             var time = array1.length * 150;
             del_Timeout = setTimeout(getimage_path, time);
             var actionBox = document.getElementById("container_actionButton").style.display = "none";
-
         }
 
-
         function deleteImg() {
-
             var show = document.getElementsByClassName("imgCheck");
             for (var i = 0; i < show.length; i++) {
                 show[i].style.display = "block";
-
-
             }
             var actionBox = document.getElementById("container_actionButton").style.display = "block";
-
-
-
         }
 
         function cancel() {
@@ -200,29 +166,13 @@
                 show[i].style.display = "none";
             }
             var actionBox = document.getElementById("container_actionButton").style.display = "none";
-
         }
-
-
-
-        function signOut() {
-            var auth2 = gapi.auth2.getAuthInstance();
-            auth2.signOut().then(function () {
-            });
-        }
-
-
-
-
         function doFormRequest_toLabel(url, action) {
             var form = document.createElement("form");
-
             form.action = url;
             form.method = action;
-
             // append input attribute and valus
             var label_json = { "key": key, "name": name, "model_name": model_name, "model_id": model_id, "model_status": model_status, "id_token": id_token };
-
             for (var keys in label_json) {
                 if (label_json.hasOwnProperty(keys)) {
                     var val = label_json[keys];
@@ -230,46 +180,76 @@
                     input.type = "hidden";
                     input.name = keys;
                     input.value = val;
-
                     // append key-value to form
                     form.appendChild(input)
                 }
             }
-
             // send post request
             document.body.appendChild(form);
             form.submit();
-
             // remove form from document
             document.body.removeChild(form);
+        }
+        var share_but = document.getElementById("share");
+        function getlabel_info(){                        
+            $.post({
+                url: ip + 'get_label_info',
+                data: {
+                    label_id: encodeURIComponent(label_id),
+                },
+                type: "POST",
+                success: function (msg) {
+                    msg = decodeURIComponent(msg);
+                    msg = JSON.parse(msg).data[0].share; 
+                    console.log(msg);
+                    if (msg == "0") {
+                        $("#share").html('<a style="cursor: pointer; display: block;" onclick="share_label(1)" class="nav-link" id="share">公開分享類別</a>');                                                
+                    } 
+                    else {                        
+                        $("#share").html('<a style="cursor: pointer; display: block;" onclick="share_label(0)" class="nav-link" id="share">取消分享類別</a>');                        
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                }
+            });
+        }
+        function share_label(share){
+            $.post({
+                url: ip + 'share_label',
+                data: {
+                    key: encodeURIComponent(key),
+                    label_id: encodeURIComponent(label_id),
+                    share: encodeURIComponent(share)
+                },
+                type: "POST",
+                success: function (msg) {
+                    msg = decodeURIComponent(msg);
+                    msg = JSON.parse(msg).message; 
+                    console.log(msg);
+                    if (msg == "ok") {
+                        if(share==1){
+                            alertify.notify('成功分享', 'custom', 2 );                            
+                            $("#share").html('<a style="cursor: pointer; display: block;" onclick="share_label(0)" class="nav-link" id="share">取消分享類別</a>');                                                                        
+                        }
+                        else{
+                            alertify.notify('成功取消分享', 'custom', 2);                            
+                            $("#share").html('<a style="cursor: pointer; display: block;" onclick="share_label(1)" class="nav-link" id="share">公開分享類別</a>');                        
+                        }
+                    }                     
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                }
+            });
         }
         function Introduction() {
             alertify.alert("<?php echo $teach; ?>", function () { });
         }
     </script>
-    <style id='wpcom-admin-bar-inline-css' type='text/css'>
-        .admin-bar {
-            position: inherit !important;
-            top: auto !important;
-        }
-
-        .admin-bar .goog-te-banner-frame {
-            top: 32px !important
-        }
-
-        @media screen and (max-width: 782px) {
-            .admin-bar .goog-te-banner-frame {
-                top: 46px !important;
-            }
-        }
-
-        @media screen and (max-width: 480px) {
-            .admin-bar .goog-te-banner-frame {
-                position: absolute;
-            }
-        }
-    </style>
     <style>
+    .alertify{
+            top : 0;
+            font-size:2.6vh;
+        }
         .Box {
             border-style: solid;
             width: 19%;
@@ -284,20 +264,24 @@
 
         .Box>img {
             position: absolute;
-            width: 100%;
-            height: 100%
+            top: 50%;
+            left: 50%;
+            display: block;
+            min-width: 100%;
+            min-height: 100%;
+            transform:translate(-50%,-50%);
         }
 
         .upload_cover {
             position: relative;
-            width: 100px;
-            height: 100px;
+            width: 50px;
+            height: 50px;
             text-align: center;
             cursor: pointer;
             transition: opacity 0.5s;
-
         }
-
+        
+        .ajs-message.ajs-custom { color: #ffffff;  background-color: #252525;  border-color: #252525; }
         .upload_cover:hover {
             opacity: 0.5;
         }
@@ -312,8 +296,8 @@
             position: absolute;
             margin-top: -13%;
             left: 0;
-            width: 70%;
-            height: 70%;
+            width: 100%;
+            height: 100%;
             top: 20%;
         }
 
@@ -329,9 +313,10 @@
             right: 0;
             zoom: 180%;
             display: none;
-
         }
-
+        .menu-wrapper{
+            margin-top:3%;
+        }
         #container_actionButton {
             margin-top: 10%;
             margin-left: 41%;
@@ -353,27 +338,20 @@
         }
 
         #footerImg {
-
             display: inline-block;
-
             -webkit-filter: blur(1px) brightness(50%) opacity(75%);
-
         }
 
         #footerImg:hover {
-
             transition-property: -webkit-filter;
             transition-duration: 0.3s;
             -webkit-filter: blur(0px) brightness(100%) opacity(100%);
-
-
         }
 
         .footerText {
             font-size: 13px;
             font-family: 'proxima-nova', sans-serif;
             display: inline-block;
-
         }
 
         #Text2::before {
@@ -391,7 +369,6 @@
             font-size: 13px;
             font-family: 'proxima-nova', sans-serif;
             color: #f2f2f2;
-
         }
 
         #Signin,
@@ -414,60 +391,59 @@
                 </div>
                 <div id='signout' style="display:inline-block; cursor:pointer;"></div>
             </div>
-            <div class="header-wrapper">
-                <div class="site-branding">
-                    <a href="index.php" class="custom-logo-link" rel="home" itemprop="url"><img width="399" height="300"
-                            src="./logo.png" class="custom-logo" alt="客製化影像辨識" itemprop="logo"
-                            sizes="(max-width: 740px) 100vw, 740px" data-attachment-id="61"
-                            data-permalink="https://123456.health.blog/cropped-imageedit_5_2410613130-2-png/"
-                            data-orig-file="https://123456health.files.wordpress.com/2019/02/cropped-imageedit_5_2410613130-2.png"
-                            data-orig-size="800,600" data-comments-opened="1"
-                            data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}"
-                            data-image-title="cropped-imageedit_5_2410613130-2.png" data-image-description="&lt;p&gt;https://123456health.files.wordpress.com/2019/02/cropped-imageedit_5_2410613130-2.png&lt;/p&gt;
-                                                                                           "
-                            data-medium-file="https://123456health.files.wordpress.com/2019/02/cropped-imageedit_5_2410613130-2.png?w=300"
-                            data-large-file="https://123456health.files.wordpress.com/2019/02/cropped-imageedit_5_2410613130-2.png?w=740" /></a>
-                    <div class="site-branding-text">
-                        <h1 class="site-title"><a href="" rel="home">客製化影像辨識</a></h1>
-                    </div><!-- .site-branding-text -->
-                </div><!-- .site-branding -->
-            </div><!-- .header-wrapper -->
-            <div class="menu-wrapper">
-                <nav id="site-navigation" class="main-navigation">
-                    <div>
-                        <ul id="header-menu" class="menu">
-                            <li id="menu-item-65"
-                                class="menu-item menu-item-type-custom menu-item-object-custom menu-item-65"><a
-                                    href="index.php">首頁</a></li>
-                            <li><a style="cursor:pointer;" onclick="doFormRequest('modellist.php','post')">模型</a></li>
-                            <li><a style="cursor:pointer;" onclick="doFormRequest_toLabel('label.php','post')">label</a>
-                            </li>
 
-                            <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-66">
-                                <!-- 请选取一个图像文件:<input type="file" id="file" name="file[]" multiple="multiple"/>  -->
-                                <label class="upload_cover">
-                                    <input id="upload_input" type="file" name="file[]" multiple="multiple" />
-                                    <img class="upload_icon" src='./icon/add.png'>
-                                    <i class="delAvatar fa fa-times-circle-o" title="刪除"></i>
-                                </label>
-                            </li>
-
-                            <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-66">
-                                <label class="upload_cover">
-                                    <img class="upload_icon" src='./icon/delete.png' onclick="deleteImg();">
-                                </label>
-                            </li>
-                            <li id="synopsis" style="cursor:pointer;">
-                                <a onclick="Introduction()">操作說明</a>
-                            </li>
-                        </ul>
-                    </div>
-                </nav><!-- #site-navigation -->
-            </div><!-- .menu-wrapper -->
+            <div style="height:auto;" class="text-center">
+                <a href="index.php"  rel="home" itemprop="url">
+                    <img width="26%" height="auto" src="./logo1.png" class="rounded" alt="客製化影像辨識" itemprop="logo" />
+                </a>
+                <div class="site-branding-text">
+                <h1 class="site-title"><a href="index.php" rel="home">CVision</a></h1>
+                </div><!-- .site-branding-text -->
+            </div><!-- .site-branding -->        
         </header><!-- #masthead -->
 
-        <h1 id='site-title' class="site-title" style="text-align:center;"></h1>
-        <div class="container">
+        
+        <div class="container" style="margin-top:3%; text-align:center;">            
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown" style="font-weight:bold;">
+                    <ul class="navbar-nav">
+                        <li class="nav-item active">
+                            <a href="index.php" class="nav-link active">首頁</a></li>
+                        <li class="nav-item">
+                            <a style="cursor:pointer;" onclick="doFormRequest('modellist.php','post')" class="nav-link">模型</a>
+                        </li>
+                        <li class="nav-item">
+                            <a style="cursor:pointer;" onclick="doFormRequest_toLabel('label.php','post')" class="nav-link">類別</a>
+                        </li>                        
+                        <li id="synopsis" style="cursor:pointer;" class="nav-item">
+                            <a onclick="Introduction()" class="nav-link">操作說明</a>                            
+                        </li>
+                        <li class="nav-item" id="share">
+                            <a style="cursor:pointer;" onclick="share_label()" class="nav-link" ></a>
+                        </li>
+                        <li class="nav-item">
+                            <a style="cursor:pointer;" onclick="doFormRequest('store.php','post')" class="nav-link">模型分享頁面</a>
+                        </li> 
+                        <li class="nav-item">
+                                <!-- 请选取一个图像文件:<input type="file" id="file" name="file[]" multiple="multiple"/>  -->
+                            <label class="upload_cover">
+                                <input id="upload_input" type="file" name="file[]" multiple="multiple" />
+                                <img class="upload_icon" src='./icon/add.png'>
+                                <i class="delAvatar fa fa-times-circle-o" title="刪除"></i>
+                            </label>
+                        </li>
+                        <li class="nav-item">
+                            <label class="upload_cover">
+                                <img class="upload_icon" src='./icon/delete.png' onclick="deleteImg();">
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </nav><!-- #site-navigation -->
+            <h2 id='site-title' class="site-title" style="text-align:center;"></h2>
             <div class="row">
                 <div class="col-md-12" id="imgTable">
                 </div>
@@ -477,7 +453,7 @@
         <script>
             var label_name = "<?php echo $label_name; ?>";
             var file_input = document.getElementById('upload_input');
-            alertify.message('圖片上傳時請勿離開此頁面',3 );  
+            alertify.notify('圖片上傳時請勿離開此頁面', 'custom', 3 );  
             //為了處理新增完即時更新圖片所設置的變數 k             
             document.getElementById('site-title').innerHTML = label_name;
             file_input.addEventListener("change", function () {  
@@ -522,22 +498,13 @@
                             error: function (xhr, ajaxOptions, thrownError) {
                             }
                         });
-
                     };
-
                     reader.readAsDataURL(file);
                 }
-
-
-
-
             });
         </script>
 
-
-
-
-        <div class="menu-wrapper">
+        <div>
             <nav id="site-navigation" class="main-navigation">
                 <div id='container_actionButton'>
                     <ul id="header-menu" class="menu">
@@ -554,17 +521,11 @@
         <footer id="colophon">
             <div class="row">
                 <div class="col-lg-1"></div>
-                <div class="col-lg-4" style="font-size:13px;margin: 1.5% 0 1.5% 0;font-family:微軟正黑體;">
-                    長榮大學資訊管理學系畢業專案發表<br>
-                    成員:尤家駿、余冠靖、張逸宗<br>
-                    指導老師:周信宏
+                <div class="col-lg-4" style="margin-top: 6%;">
+                    
                 </div>
                 <div class="col-lg-3"></div>
-                <div class="col-lg-4" style="font-size:13px;margin: 1.5% 0 0.5% 0">
-                    <a href="http://www.cjcu.edu.tw" class="logo">
-                        <img src="http://www.cjcu.edu.tw/images/logo-O1.png?v=1550022993" alt="長榮大學校徽-回首頁" width="15%">
-                        <img src="http://www.cjcu.edu.tw/images/cjcu.png?v=1550036037" alt="長榮大學書法題字" width="23%">
-                    </a>
+                <div class="col-lg-4" style="font-size:13px;margin: 1.5% 0 0.5% 0">                    
                 </div>
             </div>
         </footer>

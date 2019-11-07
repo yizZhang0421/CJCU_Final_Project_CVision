@@ -97,7 +97,7 @@ public class Home extends Frame {
         PAGES = 5;
         ViewPager brocast = findViewById(R.id.home_brocast);
         CustomPagerAdapter mAdapter = new CustomPagerAdapter(this, this.getSupportFragmentManager(),
-                new String[]{"about server","some inform","Hello~","CJCU","bala bala"},
+                new String[]{"about server","some inform","Hello~","BEARB","bala bala"},
                 new int[]{Color.parseColor("#8efe87"),Color.parseColor("#43c5f1"),Color.parseColor("#fed487"),Color.parseColor("#8efe87"),Color.parseColor("#43c5f1")}
                 );
         brocast.setAdapter(mAdapter);
